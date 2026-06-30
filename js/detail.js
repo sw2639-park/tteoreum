@@ -1,6 +1,9 @@
 import { getItem, saveItem } from './db.js';
 import { renderInbox } from './inbox.js';
 import { showSnoozeModal } from './snooze.js';
+import { setupSwipeBack } from './gestures.js';
+
+let _cleanupSwipeBack = null;
 
 export async function showDetail(id) {
   const item = await getItem(id);
@@ -9,6 +12,9 @@ export async function showDetail(id) {
   const screen = document.getElementById('detail-screen');
   screen.classList.add('active');
   document.getElementById('inbox-screen').classList.remove('active');
+
+  _cleanupSwipeBack?.();
+  _cleanupSwipeBack = setupSwipeBack(() => goBack());
 
   renderDetail(item, screen);
 }
@@ -69,6 +75,8 @@ function renderDetail(item, screen) {
 }
 
 function goBack() {
+  _cleanupSwipeBack?.();
+  _cleanupSwipeBack = null;
   document.getElementById('detail-screen').classList.remove('active');
   document.getElementById('inbox-screen').classList.add('active');
   renderInbox();

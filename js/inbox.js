@@ -1,6 +1,7 @@
 import { getInboxItems, saveItem, getAllItems } from './db.js';
 import { showPopup } from './popup.js';
 import { showSnoozeModal } from './snooze.js';
+import { setupPullToRefresh } from './gestures.js';
 
 const SWIPE_THRESHOLD = 72;
 const CONFIRM_THRESHOLD = 120;
@@ -18,10 +19,13 @@ export async function renderInbox() {
   screen.innerHTML = `
     <div class="header">
       <div class="header-brand">
-        <svg class="brand-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="12" cy="15.5" r="5" stroke="currentColor" stroke-width="1.8"/>
-          <line x1="12" y1="10.5" x2="12" y2="5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          <circle cx="12" cy="3.5" r="1.8" fill="currentColor"/>
+        <svg class="brand-icon" width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
+          <rect width="28" height="28" rx="7" fill="#FF5A36"/>
+          <line x1="6" y1="11.5" x2="14.5" y2="11.5" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity="0.45"/>
+          <line x1="4.5" y1="14" x2="14.5" y2="14" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity="0.7"/>
+          <line x1="6" y1="16.5" x2="14.5" y2="16.5" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity="0.45"/>
+          <circle cx="20" cy="14" r="5.5" fill="white"/>
+          <circle cx="20" cy="14" r="2.5" fill="#FF5A36"/>
         </svg>
         <div>
           <div class="header-title">떠오름</div>
@@ -46,6 +50,10 @@ export async function renderInbox() {
   document.getElementById('trash-btn').addEventListener('click', () => {
     import('./trash.js').then(m => m.showTrash());
   });
+
+  // 당겨서 새로고침
+  const listEl = document.getElementById('inbox-list');
+  if (listEl) setupPullToRefresh(listEl, () => renderInbox());
 
   const list = document.getElementById('inbox-list');
 

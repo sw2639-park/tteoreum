@@ -505,6 +505,19 @@ html, body {
 .action-btn.snooze-btn-d { border-color: var(--snoozed); color: var(--snoozed); }
 .action-btn.discard-btn { border-color: var(--muted); color: var(--muted); }
 
+/* ─── 당겨서 새로고침 인디케이터 ─── */
+.ptr-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 0;
+  overflow: hidden;
+  font-size: 18px;
+  color: var(--muted);
+  opacity: 0;
+  transition: height 0.1s, opacity 0.1s;
+}
+
 /* ─── 화면 전환 ─── */
 .screen {
   display: none;

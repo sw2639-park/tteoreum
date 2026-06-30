@@ -1,10 +1,21 @@
 import { getDiscardedItems, saveItem, deleteItem } from './db.js';
 import { renderInbox } from './inbox.js';
+import { setupSwipeBack } from './gestures.js';
+
+let _cleanupSwipeBack = null;
 
 export async function showTrash() {
   const screen = document.getElementById('trash-screen');
   screen.classList.add('active');
   document.getElementById('inbox-screen').classList.remove('active');
+
+  _cleanupSwipeBack?.();
+  _cleanupSwipeBack = setupSwipeBack(() => {
+    _cleanupSwipeBack?.();
+    screen.classList.remove('active');
+    document.getElementById('inbox-screen').classList.add('active');
+    renderInbox();
+  });
 
   await renderTrash();
 }
