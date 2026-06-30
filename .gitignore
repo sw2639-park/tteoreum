@@ -2,3 +2,5 @@
 docs/
 icons/make-icons.html
 .vercel/
+node_modules/
+generate-icons.js
