@@ -283,22 +283,43 @@ html, body {
 .type-chip-btn.inactive {
   background: var(--line);
   color: var(--muted);
+  border: 1.5px solid transparent;
 }
 .type-chip-btn.active-idea {
   background: rgba(45,91,255,0.15);
   color: var(--idea);
+  border: 1.5px solid var(--idea);
 }
 .type-chip-btn.active-note {
-  background: rgba(154,150,141,0.2);
-  color: var(--muted);
+  background: rgba(154,150,141,0.15);
+  color: var(--ink);
+  border: 1.5px solid var(--muted);
+}
+
+.popup-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
 }
 
 .popup-hint {
   font-size: 12px;
   color: var(--muted);
-  margin-top: 10px;
-  text-align: right;
 }
+
+.popup-save-btn {
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+}
+.popup-save-btn:active { opacity: 0.8; }
 
 /* ─── 보류 모달 ─── */
 .modal-overlay {

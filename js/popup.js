@@ -18,7 +18,10 @@ export function showPopup(source = 'icon', onClose) {
         <button class="type-chip-btn active-note" id="chip-note">메모</button>
         <button class="type-chip-btn inactive" id="chip-idea">아이디어</button>
       </div>
-      <p class="popup-hint">닫으면 자동 저장</p>
+      <div class="popup-footer">
+        <p class="popup-hint">바깥 탭해도 저장돼요</p>
+        <button class="popup-save-btn" id="popup-save">저장</button>
+      </div>
     </div>
   `;
 
@@ -32,6 +35,7 @@ export function showPopup(source = 'icon', onClose) {
 
   overlayEl.querySelector('#chip-note').addEventListener('click', () => setType('note'));
   overlayEl.querySelector('#chip-idea').addEventListener('click', () => setType('idea'));
+  overlayEl.querySelector('#popup-save').addEventListener('click', () => saveAndClose());
 
   document.addEventListener('keydown', onKeyDown);
 }
