@@ -27,6 +27,25 @@ export function showPopup(source = 'icon', onClose) {
 
   document.body.appendChild(overlayEl);
   textareaEl = overlayEl.querySelector('#popup-ta');
+
+  // 키보드가 올라오면 overlay를 visual viewport에 맞게 재조정
+  function adjustViewport() {
+    if (!window.visualViewport) return;
+    const vv = window.visualViewport;
+    overlayEl.style.top = vv.offsetTop + 'px';
+    overlayEl.style.height = vv.height + 'px';
+  }
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', adjustViewport);
+    window.visualViewport.addEventListener('scroll', adjustViewport);
+  }
+  overlayEl._cleanupViewport = () => {
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener('resize', adjustViewport);
+      window.visualViewport.removeEventListener('scroll', adjustViewport);
+    }
+  };
+
   textareaEl.focus();
 
   overlayEl.addEventListener('click', (e) => {
@@ -75,6 +94,7 @@ async function saveAndClose() {
 
 function close() {
   document.removeEventListener('keydown', onKeyDown);
+  overlayEl?._cleanupViewport?.();
   overlayEl?.remove();
   overlayEl = null;
   textareaEl = null;

@@ -29,6 +29,7 @@ export async function renderInbox() {
         </div>
       </div>
       <div class="header-icons">
+        <button class="icon-btn" id="graph-btn" title="그래프뷰">🕸</button>
         <button class="icon-btn" id="trash-btn" title="휴지통">🗑</button>
       </div>
     </div>
@@ -38,6 +39,9 @@ export async function renderInbox() {
 
   document.getElementById('fab-btn').addEventListener('click', () => {
     showPopup('icon', () => renderInbox());
+  });
+  document.getElementById('graph-btn').addEventListener('click', () => {
+    import('./graph.js').then(m => m.showGraph());
   });
   document.getElementById('trash-btn').addEventListener('click', () => {
     import('./trash.js').then(m => m.showTrash());

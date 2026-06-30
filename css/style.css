@@ -260,8 +260,9 @@ html, body {
   background: rgba(0,0,0,0.55);
   backdrop-filter: blur(2px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
+  padding-top: max(72px, env(safe-area-inset-top, 0px) + 60px);
   z-index: 100;
 }
 
@@ -511,3 +512,115 @@ html, body {
   flex-direction: column;
 }
 .screen.active { display: flex; }
+
+/* ─── 그래프뷰 (항상 다크 고정) ─── */
+.graph-screen {
+  position: relative;
+  background: radial-gradient(ellipse at 50% 35%, #0E1430 0%, #060814 65%, #030308 100%);
+  overflow: hidden;
+}
+
+.graph-screen #graph-svg {
+  width: 100%;
+  flex: 1;
+  display: block;
+  cursor: grab;
+  position: relative;
+  z-index: 2;
+}
+.graph-screen #graph-svg:active { cursor: grabbing; }
+
+.graph-topbar {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 16px;
+  font-size: 11px;
+  color: rgba(220,228,255,0.45);
+}
+
+.graph-back-btn {
+  background: none;
+  border: none;
+  color: rgba(235,240,255,0.8);
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  padding: 8px 4px;
+  min-height: 44px;
+}
+
+.graph-label {
+  font-size: 13px;
+  color: rgba(235,240,255,0.6);
+  font-weight: 600;
+}
+
+.graph-count {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(235,240,255,0.9);
+}
+
+.nebula {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.28;
+  mix-blend-mode: screen;
+  animation: drift 20s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 1;
+}
+.gn1 { width: 280px; height: 280px; background: #3B5FC4; top: -50px; left: -50px; animation-duration: 24s; }
+.gn2 { width: 320px; height: 320px; background: #6B3FA0; bottom: -70px; right: -60px; animation-duration: 28s; animation-direction: alternate-reverse; }
+.gn3 { width: 220px; height: 220px; background: #1F8A8A; bottom: 32%; left: 28%; animation-duration: 18s; }
+
+@keyframes drift {
+  from { transform: translate(0,0) scale(1); }
+  to { transform: translate(20px,-16px) scale(1.1); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 4;
+  background: radial-gradient(ellipse at 50% 45%, transparent 45%, rgba(0,0,0,0.55) 100%);
+}
+
+.graph-legend {
+  position: absolute;
+  bottom: 14px; left: 16px;
+  z-index: 5;
+  font-size: 9.5px;
+  color: rgba(220,228,255,0.5);
+  display: flex;
+  gap: 10px;
+  pointer-events: none;
+}
+.graph-legend span { display: flex; align-items: center; gap: 4px; }
+.graph-legend i { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+.gl-hub { background: #9FC2FF; }
+.gl-conn { background: #5A6A99; }
+.gl-iso { background: #5A5F75; }
+
+.graph-hint {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(220,228,255,0.5);
+  font-size: 14px;
+  z-index: 6;
+  pointer-events: none;
+}
