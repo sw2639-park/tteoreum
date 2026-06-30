@@ -78,11 +78,13 @@ html, body {
   cursor: pointer;
   color: var(--muted);
   font-size: 20px;
-  padding: 4px 6px;
+  padding: 10px 12px;
   border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
 }
 .icon-btn:active { opacity: 0.6; }
 
