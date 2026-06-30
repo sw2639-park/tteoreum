@@ -1,9 +1,9 @@
 import { purgeOldDiscarded } from './db.js';
 import { renderInbox } from './inbox.js';
 import { showPopup } from './popup.js';
+import { initPush } from './push.js';
 
 async function init() {
-  // 7일 지난 휴지통 항목 자동 삭제
   await purgeOldDiscarded();
 
   const params = new URLSearchParams(location.search);
@@ -17,6 +17,9 @@ async function init() {
   if (popup) {
     showPopup(source, () => renderInbox());
   }
+
+  // 푸시 구독 초기화 (백그라운드, 실패해도 앱 동작 무관)
+  initPush().catch(() => {});
 }
 
 init().catch(console.error);
