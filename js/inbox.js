@@ -17,9 +17,16 @@ export async function renderInbox() {
 
   screen.innerHTML = `
     <div class="header">
-      <div>
-        <div class="header-title">떠오름</div>
-        <div class="header-sub">미처리 ${unhandledCount}건 · 처리율 ${rate}%</div>
+      <div class="header-brand">
+        <svg class="brand-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="15.5" r="5" stroke="currentColor" stroke-width="1.8"/>
+          <line x1="12" y1="10.5" x2="12" y2="5.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="12" cy="3.5" r="1.8" fill="currentColor"/>
+        </svg>
+        <div>
+          <div class="header-title">떠오름</div>
+          <div class="header-sub">미처리 ${unhandledCount}건 · 처리율 ${rate}%</div>
+        </div>
       </div>
       <div class="header-icons">
         <button class="icon-btn" id="trash-btn" title="휴지통">🗑</button>
@@ -41,7 +48,8 @@ export async function renderInbox() {
   if (items.length === 0) {
     list.innerHTML = `
       <div class="empty-state">
-        <p>쌓인 거 없음</p>
+        <p class="empty-main">지금 이 순간은 맑음</p>
+        <p class="empty-sub">떠오르는 게 있으면 바로 적어두세요</p>
       </div>
     `;
     return;
