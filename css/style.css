@@ -95,7 +95,6 @@ html, body {
 
 /* ─── 인박스 목록 ─── */
 #inbox-screen {
-  display: flex;
   flex-direction: column;
   height: 100%;
 }
@@ -350,7 +349,6 @@ html, body {
 
 /* ─── 휴지통 화면 ─── */
 #trash-screen {
-  display: flex;
   flex-direction: column;
   height: 100%;
 }
@@ -401,7 +399,6 @@ html, body {
 
 /* ─── 상세 화면 ─── */
 #detail-screen {
-  display: flex;
   flex-direction: column;
   height: 100%;
 }
