@@ -48,10 +48,9 @@ async function init() {
     showPopup(source, () => renderInbox());
   }
 
-  // 푸시 구독 초기화 (백그라운드, 실패해도 앱 동작 무관)
-  initPush()
-    .then(() => showQuickCaptureNotification())
-    .catch(() => {});
+  // 푸시 구독과 캡처 알림은 서로 독립적으로 시도 (하나 실패해도 다른 쪽 영향 없음)
+  initPush().catch((e) => console.warn('initPush failed:', e.message));
+  showQuickCaptureNotification().catch((e) => console.warn('quick capture failed:', e.message));
 }
 
 init().catch(console.error);

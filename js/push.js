@@ -28,8 +28,13 @@ export async function initPush() {
 
 // 항상 떠있는 캡처용 알림 (서버 푸시와 무관, 로컬에서 직접 표시)
 export async function showQuickCaptureNotification() {
-  if (!('serviceWorker' in navigator)) return;
-  if (Notification.permission !== 'granted') return;
+  if (!('serviceWorker' in navigator) || !('Notification' in window)) return;
+
+  let permission = Notification.permission;
+  if (permission === 'default') {
+    permission = await Notification.requestPermission();
+  }
+  if (permission !== 'granted') return;
 
   const reg = await navigator.serviceWorker.ready;
   await reg.showNotification('떠오름', {
