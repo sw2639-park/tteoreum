@@ -2,6 +2,24 @@ import { purgeOldDiscarded } from './db.js';
 import { renderInbox } from './inbox.js';
 import { showPopup } from './popup.js';
 import { initPush } from './push.js';
+import { activateScreen } from './nav.js';
+
+async function route(state) {
+  const screen = state?.screen || 'inbox';
+  if (screen === 'trash') {
+    const m = await import('./trash.js');
+    await m.renderTrashScreen();
+  } else if (screen === 'detail') {
+    const m = await import('./detail.js');
+    await m.renderDetailScreen(state.id);
+  } else if (screen === 'graph') {
+    const m = await import('./graph.js');
+    await m.renderGraphScreen();
+  } else {
+    activateScreen('inbox-screen');
+    await renderInbox();
+  }
+}
 
 async function init() {
   await purgeOldDiscarded();
@@ -12,7 +30,9 @@ async function init() {
 
   // 인박스를 항상 기본으로 렌더
   await renderInbox();
-  document.getElementById('inbox-screen').classList.add('active');
+  activateScreen('inbox-screen');
+
+  window.addEventListener('popstate', (e) => route(e.state));
 
   if (popup) {
     showPopup(source, () => renderInbox());

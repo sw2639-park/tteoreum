@@ -1,14 +1,19 @@
 import { getAllItems, saveItem } from './db.js';
+import { activateScreen, pushScreen } from './nav.js';
 
 const RELAY = 'https://tteoreum-relay.vercel.app';
 const STAR = '#D9E6FF';
 const GOLD = '#FFD27A';
 const FAMILY = ['#7FA8FF', '#B79CFF', '#6FE0C9', '#E0A9D8'];
 
-export async function showGraph() {
+export function showGraph() {
+  pushScreen({ screen: 'graph' });
+  return renderGraphScreen();
+}
+
+export async function renderGraphScreen() {
   const screen = document.getElementById('graph-screen');
-  screen.classList.add('active');
-  document.getElementById('inbox-screen').classList.remove('active');
+  activateScreen('graph-screen');
 
   screen.innerHTML = `
     <div class="graph-topbar">
@@ -29,11 +34,7 @@ export async function showGraph() {
     <div class="graph-hint" id="graph-hint">태그 분석 중…</div>
   `;
 
-  document.getElementById('graph-back').addEventListener('click', () => {
-    screen.classList.remove('active');
-    document.getElementById('inbox-screen').classList.add('active');
-    import('./inbox.js').then(m => m.renderInbox());
-  });
+  document.getElementById('graph-back').addEventListener('click', () => history.back());
 
   const allItems = await getAllItems();
   const active = allItems.filter(i => i.status !== 'discarded');
@@ -294,8 +295,6 @@ function buildGraph(items) {
   }
 
   function goDetail(id) {
-    document.getElementById('graph-screen').classList.remove('active');
-    document.getElementById('inbox-screen').classList.add('active');
     import('./detail.js').then(m => m.showDetail(id));
   }
 }

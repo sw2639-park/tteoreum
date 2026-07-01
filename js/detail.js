@@ -1,22 +1,18 @@
 import { getItem, saveItem } from './db.js';
-import { renderInbox } from './inbox.js';
 import { showSnoozeModal } from './snooze.js';
-import { setupSwipeBack } from './gestures.js';
+import { activateScreen, pushScreen } from './nav.js';
 
-let _cleanupSwipeBack = null;
+export function showDetail(id) {
+  pushScreen({ screen: 'detail', id });
+  return renderDetailScreen(id);
+}
 
-export async function showDetail(id) {
+export async function renderDetailScreen(id) {
   const item = await getItem(id);
-  if (!item) return;
+  if (!item) { history.back(); return; }
 
-  const screen = document.getElementById('detail-screen');
-  screen.classList.add('active');
-  document.getElementById('inbox-screen').classList.remove('active');
-
-  _cleanupSwipeBack?.();
-  _cleanupSwipeBack = setupSwipeBack(() => goBack());
-
-  renderDetail(item, screen);
+  activateScreen('detail-screen');
+  renderDetail(item, document.getElementById('detail-screen'));
 }
 
 function renderDetail(item, screen) {
@@ -47,7 +43,7 @@ function renderDetail(item, screen) {
     </div>
   `;
 
-  document.getElementById('detail-back').addEventListener('click', goBack);
+  document.getElementById('detail-back').addEventListener('click', () => history.back());
 
   document.getElementById('type-toggle').addEventListener('click', async () => {
     item.type = item.type === 'idea' ? 'note' : 'idea';
@@ -59,27 +55,19 @@ function renderDetail(item, screen) {
     item.status = 'handled';
     item.handledAt = new Date().toISOString();
     await saveItem(item);
-    goBack();
+    history.back();
   });
 
   document.getElementById('d-snooze').addEventListener('click', () => {
-    showSnoozeModal(item, goBack);
+    showSnoozeModal(item, () => history.back());
   });
 
   document.getElementById('d-discard').addEventListener('click', async () => {
     item.status = 'discarded';
     item.discardedAt = new Date().toISOString();
     await saveItem(item);
-    goBack();
+    history.back();
   });
-}
-
-function goBack() {
-  _cleanupSwipeBack?.();
-  _cleanupSwipeBack = null;
-  document.getElementById('detail-screen').classList.remove('active');
-  document.getElementById('inbox-screen').classList.add('active');
-  renderInbox();
 }
 
 function escapeHtml(str) {
