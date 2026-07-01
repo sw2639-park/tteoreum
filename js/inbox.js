@@ -19,14 +19,7 @@ export async function renderInbox() {
   screen.innerHTML = `
     <div class="header">
       <div class="header-brand">
-        <svg class="brand-icon" width="28" height="28" viewBox="0 0 28 28" xmlns="http://www.w3.org/2000/svg">
-          <rect width="28" height="28" rx="7" fill="#FF5A36"/>
-          <line x1="6" y1="11.5" x2="14.5" y2="11.5" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity="0.45"/>
-          <line x1="4.5" y1="14" x2="14.5" y2="14" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity="0.7"/>
-          <line x1="6" y1="16.5" x2="14.5" y2="16.5" stroke="white" stroke-width="2.2" stroke-linecap="round" opacity="0.45"/>
-          <circle cx="20" cy="14" r="5.5" fill="white"/>
-          <circle cx="20" cy="14" r="2.5" fill="#FF5A36"/>
-        </svg>
+        <img class="brand-icon" src="/icons/icon-192.png" width="28" height="28" alt="" />
         <div>
           <div class="header-title">떠오름</div>
           <div class="header-sub">미처리 ${unhandledCount}건 · 처리율 ${rate}%</div>

@@ -67,8 +67,9 @@ html, body {
 }
 
 .brand-icon {
-  color: var(--accent);
   flex-shrink: 0;
+  border-radius: 7px;
+  display: block;
 }
 
 .header-title {
@@ -177,9 +178,11 @@ html, body {
 
 .item-type-chip {
   flex-shrink: 0;
+  width: 52px;
+  text-align: center;
   font-size: 11px;
   font-weight: 600;
-  padding: 2px 7px;
+  padding: 2px 0;
   border-radius: 10px;
   margin-top: 2px;
 }
