@@ -26,9 +26,15 @@ export async function renderInbox() {
         </div>
       </div>
       <div class="header-icons">
-        <button class="icon-btn" id="graph-btn" title="그래프뷰">🕸</button>
-        <button class="icon-btn" id="handled-btn" title="완료함">✓</button>
-        <button class="icon-btn" id="trash-btn" title="휴지통">🗑</button>
+        <button class="icon-btn" id="graph-btn" title="그래프뷰">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </button>
+        <button class="icon-btn" id="handled-btn" title="완료함">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="5" rx="1"/><path d="M4 9v9a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9"/><line x1="10" y1="13" x2="14" y2="13"/></svg>
+        </button>
+        <button class="icon-btn" id="trash-btn" title="휴지통">
+          <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+        </button>
       </div>
     </div>
     <div class="inbox-list" id="inbox-list"></div>
