@@ -32,7 +32,17 @@
   <script type="module" src="/js/app.js"></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js').catch(console.error);
+      let refreshed = false;
+      navigator.serviceWorker.addEventListener('controllerchange', () => {
+        if (refreshed) return;
+        refreshed = true;
+        window.location.reload();
+      });
+      navigator.serviceWorker.register('/sw.js').then(reg => {
+        // 새 배포 감지 시 즉시 업데이트 확인 + 활성화
+        reg.update();
+        setInterval(() => reg.update(), 60 * 1000);
+      }).catch(console.error);
     }
   </script>
 </body>
