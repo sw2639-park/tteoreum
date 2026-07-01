@@ -6,12 +6,19 @@ import { activateScreen } from './nav.js';
 
 async function route(state) {
   const screen = state?.screen || 'inbox';
+
+  // 상세 팝업은 오버레이라 화면 전환과 무관하게 항상 정리
+  if (screen !== 'detail') {
+    const d = await import('./detail.js');
+    d.closeDetailPopup();
+  }
+
   if (screen === 'trash') {
     const m = await import('./trash.js');
     await m.renderTrashScreen();
   } else if (screen === 'detail') {
     const m = await import('./detail.js');
-    await m.renderDetailScreen(state.id);
+    await m.renderDetailPopup(state.id);
   } else if (screen === 'graph') {
     const m = await import('./graph.js');
     await m.renderGraphScreen();

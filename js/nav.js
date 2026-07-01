@@ -1,6 +1,6 @@
 import { setupSwipeBack } from './gestures.js';
 
-const SCREEN_IDS = ['inbox-screen', 'trash-screen', 'detail-screen', 'graph-screen', 'handled-screen'];
+const SCREEN_IDS = ['inbox-screen', 'trash-screen', 'graph-screen', 'handled-screen'];
 
 let cleanupSwipe = null;
 
