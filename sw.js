@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tteoreum-v17';
+const CACHE_NAME = 'tteoreum-v18';
 const ASSETS = [
   '/',
   '/index.html',
@@ -117,8 +117,20 @@ async function handlePush(e) {
 
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
-  e.waitUntil(clients.openWindow('/?source=notification&popup=1'));
+  const url = '/?source=notification&popup=1';
+  e.waitUntil(openOrFocus(url));
 });
+
+async function openOrFocus(url) {
+  const allClients = await clients.matchAll({ type: 'window', includeUncontrolled: true });
+  for (const client of allClients) {
+    if ('navigate' in client && 'focus' in client) {
+      await client.navigate(url);
+      return client.focus();
+    }
+  }
+  return clients.openWindow(url);
+}
 
 // 사용자가 캡처용 알림을 직접 지워도 즉시 다시 띄움 (항상 떠있게)
 self.addEventListener('notificationclose', (e) => {
