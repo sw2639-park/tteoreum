@@ -1,12 +1,12 @@
-// 드래그백: 화면 어디서나 오른쪽으로 밀면 뒤로가기
-// (Android OS가 왼쪽 엣지를 가져가므로 엣지 제한 없이 전체 감지)
-export function setupSwipeBack(onBack) {
-  const MIN_DIST = 90;  // 최소 수평 이동 (px)
-  const MAX_V_RATIO = 0.55; // 수직 비율 상한 (이 이하여야 수평 제스처로 인식)
+const SWIPE_MIN_DIST = 90;   // 최소 수평 이동 (px)
+const SWIPE_MAX_V_RATIO = 0.55; // 수직 비율 상한 (이 이하여야 수평 제스처로 인식)
 
+// 공용 좌우 스와이프 감지. onRight/onLeft 콜백, ignoreSelector로 특정 영역 제외 가능
+function setupHorizontalSwipe(el, { onRight, onLeft, ignoreSelector } = {}) {
   let startX = 0, startY = 0, tracking = false, cancelled = false;
 
   function onStart(e) {
+    if (ignoreSelector && e.target.closest?.(ignoreSelector)) { tracking = false; return; }
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
     tracking = true;
@@ -27,18 +27,31 @@ export function setupSwipeBack(onBack) {
     if (cancelled) return;
     const dx = e.changedTouches[0].clientX - startX;
     const dy = Math.abs(e.changedTouches[0].clientY - startY);
-    if (dx > MIN_DIST && dy < dx * MAX_V_RATIO) onBack();
+    if (dy >= Math.abs(dx) * SWIPE_MAX_V_RATIO) return;
+    if (dx > SWIPE_MIN_DIST) onRight?.();
+    else if (dx < -SWIPE_MIN_DIST) onLeft?.();
   }
 
-  document.addEventListener('touchstart', onStart, { passive: true });
-  document.addEventListener('touchmove', onMove, { passive: true });
-  document.addEventListener('touchend', onEnd, { passive: true });
+  el.addEventListener('touchstart', onStart, { passive: true });
+  el.addEventListener('touchmove', onMove, { passive: true });
+  el.addEventListener('touchend', onEnd, { passive: true });
 
   return () => {
-    document.removeEventListener('touchstart', onStart);
-    document.removeEventListener('touchmove', onMove);
-    document.removeEventListener('touchend', onEnd);
+    el.removeEventListener('touchstart', onStart);
+    el.removeEventListener('touchmove', onMove);
+    el.removeEventListener('touchend', onEnd);
   };
+}
+
+// 드래그백: 화면 어디서나 오른쪽으로 밀면 뒤로가기
+// (Android OS가 왼쪽 엣지를 가져가므로 엣지 제한 없이 전체 감지)
+export function setupSwipeBack(onBack) {
+  return setupHorizontalSwipe(document, { onRight: onBack });
+}
+
+// 화면 내 지정 영역(빈 공간)에서 왼쪽으로 밀면 다음 화면으로 이동
+export function setupSwipeForward(el, onForward, ignoreSelector) {
+  return setupHorizontalSwipe(el, { onLeft: onForward, ignoreSelector });
 }
 
 // 당겨서 새로고침: 스크롤 최상단에서 아래로 당기면 콜백 실행

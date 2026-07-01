@@ -23,3 +23,9 @@ export function activateScreen(id) {
 export function pushScreen(state) {
   history.pushState(state, '');
 }
+
+// 같은 깊이의 화면끼리 옆으로 이동 (히스토리를 쌓지 않고 교체) —
+// 그래프↔완료함↔휴지통처럼 나란히 넘나들 때, 뒤로가기는 항상 메인화면으로 바로 가야 하므로 사용
+export function replaceScreen(state) {
+  history.replaceState(state, '');
+}

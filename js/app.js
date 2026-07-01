@@ -2,7 +2,29 @@ import { purgeOldDiscarded } from './db.js';
 import { renderInbox } from './inbox.js';
 import { showPopup } from './popup.js';
 import { initPush, showQuickCaptureNotification } from './push.js';
-import { activateScreen } from './nav.js';
+import { activateScreen, replaceScreen } from './nav.js';
+import { setupSwipeForward } from './gestures.js';
+
+// 헤더 아이콘 순서(그래프 → 완료함 → 휴지통)대로 왼쪽 스와이프 이동.
+// 옆으로 이동은 replaceScreen을 써서 히스토리를 쌓지 않으므로,
+// 드래그백(오른쪽 스와이프)은 어디서든 메인화면으로 바로 돌아감.
+function setupPageSwipes() {
+  setupSwipeForward(document.getElementById('inbox-screen'), () => {
+    import('./graph.js').then(m => m.showGraph());
+  }, '.item-row, .icon-btn, .fab');
+
+  setupSwipeForward(document.getElementById('graph-screen'), async () => {
+    replaceScreen({ screen: 'handled' });
+    const m = await import('./handled.js');
+    await m.renderHandledScreen();
+  }, '#graph-svg');
+
+  setupSwipeForward(document.getElementById('handled-screen'), async () => {
+    replaceScreen({ screen: 'trash' });
+    const m = await import('./trash.js');
+    await m.renderTrashScreen();
+  }, '.handled-item, .icon-btn');
+}
 
 async function route(state) {
   const screen = state?.screen || 'inbox';
@@ -41,6 +63,7 @@ async function init() {
   // 인박스를 항상 기본으로 렌더
   await renderInbox();
   activateScreen('inbox-screen');
+  setupPageSwipes();
 
   window.addEventListener('popstate', (e) => route(e.state));
 
