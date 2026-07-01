@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tteoreum-v13';
+const CACHE_NAME = 'tteoreum-v14';
 const ASSETS = [
   '/',
   '/index.html',
@@ -101,14 +101,8 @@ self.addEventListener('push', (e) => {
 });
 
 async function handlePush(e) {
-  const data = e.data?.json() || {};
   const count = await countUnhandled();
-  const isSunday = new Date().getDay() === 0;
-
-  let body = `미처리 ${count}건`;
-  if (isSunday && data.weeklySummary) {
-    body += `\n${data.weeklySummary}`;
-  }
+  const body = `미처리 ${count}건`;
 
   await self.registration.showNotification(body, {
     tag: 'daily-check',
