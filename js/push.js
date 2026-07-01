@@ -26,6 +26,24 @@ export async function initPush() {
   await sendSubscription(sub);
 }
 
+// 항상 떠있는 캡처용 알림 (서버 푸시와 무관, 로컬에서 직접 표시)
+export async function showQuickCaptureNotification() {
+  if (!('serviceWorker' in navigator)) return;
+  if (Notification.permission !== 'granted') return;
+
+  const reg = await navigator.serviceWorker.ready;
+  await reg.showNotification('떠오름', {
+    tag: 'quick-capture',
+    renotify: false,
+    silent: true,
+    requireInteraction: true,
+    icon: '/icons/status-mono.png',
+    badge: '/icons/status-mono.png',
+    body: '탭해서 바로 기록하기',
+    data: { intent: 'popup-input' },
+  });
+}
+
 async function sendSubscription(sub) {
   try {
     await fetch(`${RELAY_URL}/api/subscribe`, {

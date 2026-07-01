@@ -1,7 +1,7 @@
 import { purgeOldDiscarded } from './db.js';
 import { renderInbox } from './inbox.js';
 import { showPopup } from './popup.js';
-import { initPush } from './push.js';
+import { initPush, showQuickCaptureNotification } from './push.js';
 import { activateScreen } from './nav.js';
 
 async function route(state) {
@@ -49,7 +49,9 @@ async function init() {
   }
 
   // 푸시 구독 초기화 (백그라운드, 실패해도 앱 동작 무관)
-  initPush().catch(() => {});
+  initPush()
+    .then(() => showQuickCaptureNotification())
+    .catch(() => {});
 }
 
 init().catch(console.error);
