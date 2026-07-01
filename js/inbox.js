@@ -34,6 +34,7 @@ export async function renderInbox() {
       </div>
       <div class="header-icons">
         <button class="icon-btn" id="graph-btn" title="그래프뷰">🕸</button>
+        <button class="icon-btn" id="handled-btn" title="완료함">✓</button>
         <button class="icon-btn" id="trash-btn" title="휴지통">🗑</button>
       </div>
     </div>
@@ -49,6 +50,9 @@ export async function renderInbox() {
   });
   document.getElementById('trash-btn').addEventListener('click', () => {
     import('./trash.js').then(m => m.showTrash());
+  });
+  document.getElementById('handled-btn').addEventListener('click', () => {
+    import('./handled.js').then(m => m.showHandled());
   });
 
   // 당겨서 새로고침

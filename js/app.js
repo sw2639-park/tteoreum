@@ -15,6 +15,9 @@ async function route(state) {
   } else if (screen === 'graph') {
     const m = await import('./graph.js');
     await m.renderGraphScreen();
+  } else if (screen === 'handled') {
+    const m = await import('./handled.js');
+    await m.renderHandledScreen();
   } else {
     activateScreen('inbox-screen');
     await renderInbox();

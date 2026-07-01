@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tteoreum-v5';
+const CACHE_NAME = 'tteoreum-v6';
 const ASSETS = [
   '/',
   '/index.html',
@@ -14,6 +14,7 @@ const ASSETS = [
   '/js/graph.js',
   '/js/gestures.js',
   '/js/nav.js',
+  '/js/handled.js',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
