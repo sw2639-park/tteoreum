@@ -3,6 +3,8 @@ import { showSnoozeModal } from './snooze.js';
 import { setupSwipeBack } from './gestures.js';
 import { pushScreen } from './nav.js';
 
+const RELAY = 'https://tteoreum-relay.vercel.app';
+
 let overlayEl = null;
 let cleanupSwipe = null;
 
@@ -52,6 +54,18 @@ function renderCard(item) {
       </div>
       <div class="detail-popup-body">
         <div class="detail-content">${escapeHtml(item.content)}</div>
+        ${item.tags?.length ? `
+          <div class="detail-tags">
+            ${item.tags.map(t => `<span class="tag-chip">#${escapeHtml(t)}</span>`).join('')}
+          </div>
+        ` : ''}
+        <button class="develop-btn" id="d-develop">✨ 발전</button>
+        ${item.aiSummary ? `
+          <div class="ai-summary">
+            <div class="ai-summary-label">발전 결과</div>
+            <div class="ai-summary-text">${escapeHtml(item.aiSummary)}</div>
+          </div>
+        ` : ''}
       </div>
       <div class="detail-actions">
         <button class="action-btn handled-btn" id="d-handle">처리</button>
@@ -62,6 +76,28 @@ function renderCard(item) {
   `;
 
   overlayEl.querySelector('#detail-close').addEventListener('click', () => history.back());
+
+  overlayEl.querySelector('#d-develop').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    btn.disabled = true;
+    btn.textContent = '생각하는 중…';
+    try {
+      const res = await fetch(`${RELAY}/api/develop`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ content: item.content }),
+      });
+      if (!res.ok) throw new Error('develop failed');
+      const { summary } = await res.json();
+      item.aiSummary = summary;
+      await saveItem(item);
+      renderCard(item);
+    } catch (err) {
+      btn.disabled = false;
+      btn.textContent = '✨ 발전';
+      console.warn('develop failed:', err.message);
+    }
+  });
 
   overlayEl.querySelector('#type-toggle').addEventListener('click', async () => {
     item.type = item.type === 'idea' ? 'note' : 'idea';

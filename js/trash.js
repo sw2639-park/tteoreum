@@ -32,7 +32,12 @@ async function renderTrashList() {
   const list = document.getElementById('trash-list');
 
   if (items.length === 0) {
-    list.innerHTML = `<div class="empty-state" style="padding-top:60px"><p>휴지통이 비어있음</p></div>`;
+    list.innerHTML = `
+      <div class="empty-state">
+        <p class="empty-main">휴지통이 비어있음</p>
+        <p class="empty-sub">폐기한 항목은 여기 7일간 보관돼요</p>
+      </div>
+    `;
     return;
   }
 

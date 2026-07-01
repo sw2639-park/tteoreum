@@ -33,7 +33,12 @@ async function renderHandledList() {
   const list = document.getElementById('handled-list');
 
   if (items.length === 0) {
-    list.innerHTML = `<div class="empty-state" style="padding-top:60px"><p>아직 처리된 항목이 없음</p></div>`;
+    list.innerHTML = `
+      <div class="empty-state">
+        <p class="empty-main">아직 처리된 항목이 없음</p>
+        <p class="empty-sub">인박스에서 처리하면 여기 쌓여요</p>
+      </div>
+    `;
     return;
   }
 
