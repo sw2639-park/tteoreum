@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tteoreum-v15';
+const CACHE_NAME = 'tteoreum-v16';
 const ASSETS = [
   '/',
   '/index.html',
@@ -119,6 +119,25 @@ self.addEventListener('notificationclick', (e) => {
   e.notification.close();
   e.waitUntil(clients.openWindow('/?source=notification&popup=1'));
 });
+
+// 사용자가 캡처용 알림을 직접 지워도 즉시 다시 띄움 (항상 떠있게)
+self.addEventListener('notificationclose', (e) => {
+  if (e.notification.tag !== 'quick-capture') return;
+  e.waitUntil(showQuickCapture());
+});
+
+function showQuickCapture() {
+  return self.registration.showNotification('떠오름', {
+    tag: 'quick-capture',
+    renotify: false,
+    silent: true,
+    requireInteraction: true,
+    icon: '/icons/status-mono.png',
+    badge: '/icons/status-mono.png',
+    body: '탭해서 바로 기록하기',
+    data: { intent: 'popup-input' },
+  });
+}
 
 function countUnhandled() {
   return new Promise((resolve) => {
