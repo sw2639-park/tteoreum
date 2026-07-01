@@ -143,26 +143,28 @@ html, body {
   pointer-events: none;
 }
 
+/* 오른쪽으로 밀면 콘텐츠가 오른쪽으로 이동 → 왼쪽부터 배경이 드러남 → 글자도 왼쪽 정렬 */
 .item-bg-right {
-  justify-content: flex-end;
-  padding-right: 20px;
+  justify-content: flex-start;
+  padding-left: 20px;
   background: var(--handled);
   opacity: 0;
   transition: opacity 0.1s;
   color: white;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
+/* 왼쪽으로 밀면 콘텐츠가 왼쪽으로 이동 → 오른쪽부터 배경이 드러남 → 글자도 오른쪽 정렬 */
 .item-bg-left {
-  justify-content: flex-start;
-  padding-left: 20px;
+  justify-content: flex-end;
+  padding-right: 20px;
   background: var(--snoozed);
   opacity: 0;
   transition: opacity 0.1s;
   color: white;
   font-size: 14px;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .item-content {
@@ -189,10 +191,15 @@ html, body {
 .chip-idea { background: rgba(45,91,255,0.12); color: var(--idea); }
 .chip-note { background: rgba(154,150,141,0.15); color: var(--muted); }
 
-.item-text {
+.item-body {
   flex: 1;
+  min-width: 0;
+}
+
+.item-text {
   font-size: 15px;
   line-height: 1.5;
+  height: 4.5em;
   color: var(--ink);
   word-break: break-word;
   white-space: pre-wrap;
@@ -204,6 +211,7 @@ html, body {
 
 .item-meta {
   font-size: 12px;
+  text-align: right;
   color: var(--muted);
   margin-top: 4px;
 }
