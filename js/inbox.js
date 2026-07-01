@@ -107,10 +107,8 @@ function buildItemRow(item) {
     <div class="item-bg item-bg-left">보류 ⏰</div>
     <div class="item-content">
       <span class="item-type-chip ${chipClass}">${chipLabel}</span>
-      <div class="item-body">
-        <div class="item-text">${escapeHtml(item.content)}</div>
-        <div class="item-meta">${dateStr}</div>
-      </div>
+      <div class="item-text">${escapeHtml(item.content)}</div>
+      <span class="item-time">${dateStr}</span>
     </div>
   `;
 

@@ -170,9 +170,9 @@ html, body {
 .item-content {
   position: relative;
   background: var(--bg);
-  padding: 14px 16px;
+  padding: 12px 16px;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 10px;
   transition: transform 0.05s linear;
   will-change: transform;
@@ -187,34 +187,25 @@ html, body {
   font-weight: 600;
   padding: 2px 0;
   border-radius: 10px;
-  margin-top: 2px;
 }
 .chip-idea { background: rgba(45,91,255,0.12); color: var(--idea); }
 .chip-note { background: rgba(154,150,141,0.15); color: var(--muted); }
 
-.item-body {
+.item-text {
   flex: 1;
   min-width: 0;
-}
-
-.item-text {
   font-size: 15px;
   line-height: 1.5;
-  height: 3em;
   color: var(--ink);
-  word-break: break-word;
-  white-space: pre-wrap;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  white-space: nowrap;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.item-meta {
+.item-time {
+  flex-shrink: 0;
   font-size: 12px;
-  text-align: right;
   color: var(--muted);
-  margin-top: 4px;
 }
 
 /* ─── 빈 상태 ─── */
@@ -584,7 +575,7 @@ html, body {
 .detail-actions {
   display: flex;
   gap: 8px;
-  padding: 12px 14px;
+  padding: 14px;
   border-top: 1px solid var(--line);
   background: var(--bg);
 }
@@ -592,21 +583,19 @@ html, body {
 .action-btn {
   flex: 1;
   padding: 11px 8px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: none;
-  color: var(--ink);
+  border-radius: 14px;
+  border: none;
   font-family: inherit;
   font-size: 13.5px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   text-align: center;
-  transition: background 0.15s;
+  transition: transform 0.12s, opacity 0.12s;
 }
-.action-btn:active { background: var(--line); }
-.action-btn.handled-btn { border-color: var(--handled); color: var(--handled); }
-.action-btn.snooze-btn-d { border-color: var(--snoozed); color: var(--snoozed); }
-.action-btn.discard-btn { border-color: var(--muted); color: var(--muted); }
+.action-btn:active { transform: scale(0.96); opacity: 0.8; }
+.action-btn.handled-btn { background: rgba(34,197,94,0.12); color: var(--handled); }
+.action-btn.snooze-btn-d { background: rgba(245,158,11,0.12); color: var(--snoozed); }
+.action-btn.discard-btn { background: var(--line); color: var(--muted); }
 
 /* ─── 당겨서 새로고침 인디케이터 ─── */
 .ptr-indicator {

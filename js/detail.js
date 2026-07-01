@@ -54,8 +54,8 @@ function renderCard(item) {
         <div class="detail-content">${escapeHtml(item.content)}</div>
       </div>
       <div class="detail-actions">
-        <button class="action-btn handled-btn" id="d-handle">처리 ✓</button>
-        <button class="action-btn snooze-btn-d" id="d-snooze">보류 ⏰</button>
+        <button class="action-btn handled-btn" id="d-handle">처리</button>
+        <button class="action-btn snooze-btn-d" id="d-snooze">보류</button>
         <button class="action-btn discard-btn" id="d-discard">폐기</button>
       </div>
     </div>
