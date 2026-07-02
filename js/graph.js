@@ -100,7 +100,12 @@ function buildGraph(items) {
   const H = svgEl.clientHeight || window.innerHeight;
 
   // 노드·링크 빌드
-  const nodes = items.map(i => ({ id: i.id, label: i.content.slice(0, 30), tags: i.tags || [], item: i }));
+  const nodes = items.map(i => ({
+    id: i.id,
+    label: i.content.length > 12 ? i.content.slice(0, 12) + '…' : i.content,
+    tags: i.tags || [],
+    item: i,
+  }));
   const links = [];
   for (let i = 0; i < nodes.length; i++) {
     for (let j = i + 1; j < nodes.length; j++) {
@@ -189,13 +194,15 @@ function buildGraph(items) {
   const labels = nodeSel.append('text').text(d => d.label)
     .attr('font-size', 9.5).attr('dy', d => -(13 + Math.min(degree[d.id], 4) * 2.2))
     .attr('text-anchor', 'middle').attr('opacity', 0).attr('fill', '#EAEFFF')
-    .style('pointer-events', 'none').style('font-family', '-apple-system, sans-serif');
+    .attr('stroke', 'rgba(6,8,20,0.85)').attr('stroke-width', 3)
+    .style('paint-order', 'stroke').style('pointer-events', 'none')
+    .style('font-family', '-apple-system, sans-serif');
 
   const sim = d3.forceSimulation(nodes)
-    .force('link', d3.forceLink(links).id(d => d.id).distance(74).strength(0.5))
-    .force('charge', d3.forceManyBody().strength(-170))
+    .force('link', d3.forceLink(links).id(d => d.id).distance(100).strength(0.5))
+    .force('charge', d3.forceManyBody().strength(-220))
     .force('center', d3.forceCenter(W / 2, H / 2))
-    .force('collide', d3.forceCollide(d => 15 + Math.min(degree[d.id], 4) * 2.6))
+    .force('collide', d3.forceCollide(d => 26 + Math.min(degree[d.id], 4) * 2.6))
     .alphaDecay(0.03)
     .on('tick', () => {
       linkSel.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
