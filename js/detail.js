@@ -7,6 +7,7 @@ const RELAY = 'https://tteoreum-relay.vercel.app';
 
 let overlayEl = null;
 let cleanupSwipe = null;
+let currentItem = null;
 
 export function showDetail(id) {
   pushScreen({ screen: 'detail', id });
@@ -16,15 +17,16 @@ export function showDetail(id) {
 export async function renderDetailPopup(id) {
   const item = await getItem(id);
   if (!item) { history.back(); return; }
+  currentItem = item;
 
   if (!overlayEl) {
     overlayEl = document.createElement('div');
     overlayEl.className = 'detail-overlay';
     document.body.appendChild(overlayEl);
     overlayEl.addEventListener('click', (e) => {
-      if (e.target === overlayEl) history.back();
+      if (e.target === overlayEl) closeWithSave();
     });
-    cleanupSwipe = setupSwipeBack(() => history.back());
+    cleanupSwipe = setupSwipeBack(() => closeWithSave());
   }
 
   renderCard(item);
@@ -35,6 +37,23 @@ export function closeDetailPopup() {
   cleanupSwipe = null;
   overlayEl?.remove();
   overlayEl = null;
+  currentItem = null;
+}
+
+async function closeWithSave() {
+  if (currentItem) {
+    syncContentEdit(currentItem);
+    await saveItem(currentItem);
+  }
+  history.back();
+}
+
+// 수정 중인 textarea 내용을 item에 반영 (빈 내용이면 원래 내용 유지)
+function syncContentEdit(item) {
+  const ta = overlayEl?.querySelector('#detail-content-input');
+  if (!ta) return;
+  const val = ta.value.trim();
+  if (val) item.content = val;
 }
 
 function renderCard(item) {
@@ -53,7 +72,7 @@ function renderCard(item) {
         <button class="icon-btn detail-close-btn" id="detail-close">✕</button>
       </div>
       <div class="detail-popup-body">
-        <div class="detail-content">${escapeHtml(item.content)}</div>
+        <textarea class="detail-content" id="detail-content-input" rows="1">${escapeHtml(item.content)}</textarea>
         ${item.tags?.length ? `
           <div class="detail-tags">
             ${item.tags.map(t => `<span class="tag-chip">#${escapeHtml(t)}</span>`).join('')}
@@ -75,9 +94,14 @@ function renderCard(item) {
     </div>
   `;
 
-  overlayEl.querySelector('#detail-close').addEventListener('click', () => history.back());
+  const textarea = overlayEl.querySelector('#detail-content-input');
+  autoGrow(textarea);
+  textarea.addEventListener('input', () => autoGrow(textarea));
+
+  overlayEl.querySelector('#detail-close').addEventListener('click', () => closeWithSave());
 
   overlayEl.querySelector('#d-develop').addEventListener('click', async (e) => {
+    syncContentEdit(item);
     const btn = e.currentTarget;
     btn.disabled = true;
     btn.textContent = '생각하는 중…';
@@ -100,12 +124,14 @@ function renderCard(item) {
   });
 
   overlayEl.querySelector('#type-toggle').addEventListener('click', async () => {
+    syncContentEdit(item);
     item.type = item.type === 'idea' ? 'note' : 'idea';
     await saveItem(item);
     renderCard(item);
   });
 
   overlayEl.querySelector('#d-handle').addEventListener('click', async () => {
+    syncContentEdit(item);
     item.status = 'handled';
     item.handledAt = new Date().toISOString();
     await saveItem(item);
@@ -113,15 +139,22 @@ function renderCard(item) {
   });
 
   overlayEl.querySelector('#d-snooze').addEventListener('click', () => {
+    syncContentEdit(item);
     showSnoozeModal(item, () => history.back());
   });
 
   overlayEl.querySelector('#d-discard').addEventListener('click', async () => {
+    syncContentEdit(item);
     item.status = 'discarded';
     item.discardedAt = new Date().toISOString();
     await saveItem(item);
     history.back();
   });
+}
+
+function autoGrow(textarea) {
+  textarea.style.height = 'auto';
+  textarea.style.height = textarea.scrollHeight + 'px';
 }
 
 function escapeHtml(str) {

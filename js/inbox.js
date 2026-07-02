@@ -2,6 +2,7 @@ import { getInboxItems, saveItem, getAllItems } from './db.js';
 import { showPopup } from './popup.js';
 import { showSnoozeModal } from './snooze.js';
 import { setupPullToRefresh } from './gestures.js';
+import { showConfirm } from './confirm.js';
 
 const SWIPE_THRESHOLD = 72;
 const CONFIRM_THRESHOLD = 120;
@@ -198,7 +199,8 @@ function setupLongPress(row, item) {
   content.addEventListener('touchstart', () => {
     timer = setTimeout(async () => {
       timer = null;
-      if (confirm('이 항목을 휴지통으로 보낼까요?')) {
+      const ok = await showConfirm('이 항목을 휴지통으로 보낼까요?', '휴지통으로', '취소');
+      if (ok) {
         item.status = 'discarded';
         item.discardedAt = new Date().toISOString();
         await saveItem(item);

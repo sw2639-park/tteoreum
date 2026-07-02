@@ -563,11 +563,18 @@ html, body {
 }
 
 .detail-content {
+  display: block;
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  overflow: hidden;
+  background: transparent;
+  font-family: inherit;
   font-size: 16px;
   line-height: 1.65;
   color: var(--ink);
-  word-break: break-word;
-  white-space: pre-wrap;
+  padding: 0;
 }
 
 .detail-type-chip {
@@ -658,6 +665,56 @@ html, body {
 .action-btn.handled-btn { background: rgba(34,197,94,0.12); color: var(--handled); }
 .action-btn.snooze-btn-d { background: rgba(245,158,11,0.12); color: var(--snoozed); }
 .action-btn.discard-btn { background: var(--line); color: var(--muted); }
+
+/* ─── 확인 모달 ─── */
+.confirm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(2px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 300;
+}
+
+.confirm-card {
+  width: 100%;
+  max-width: 300px;
+  background: var(--bg);
+  border-radius: 18px;
+  padding: 20px 18px 16px;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.3), 0 4px 14px rgba(0,0,0,0.14);
+  text-align: center;
+}
+
+.confirm-message {
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+  margin-bottom: 16px;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.confirm-btn {
+  flex: 1;
+  padding: 10px 8px;
+  border: none;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.12s, opacity 0.12s;
+}
+.confirm-btn:active { transform: scale(0.96); opacity: 0.85; }
+.confirm-cancel { background: var(--line); color: var(--muted); }
+.confirm-ok { background: rgba(255,90,54,0.12); color: var(--accent); }
 
 /* ─── 당겨서 새로고침 인디케이터 ─── */
 .ptr-indicator {
