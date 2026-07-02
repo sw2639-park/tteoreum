@@ -143,11 +143,11 @@ html, body {
   pointer-events: none;
 }
 
-/* 오른쪽으로 밀면 콘텐츠가 오른쪽으로 이동 → 왼쪽부터 배경이 드러남 → 글자도 왼쪽 정렬 */
+/* 오른쪽으로 밀면 콘텐츠가 오른쪽으로 이동 → 왼쪽부터 배경이 드러남 → 글자도 왼쪽 정렬 (보류) */
 .item-bg-right {
   justify-content: flex-start;
   padding-left: 20px;
-  background: var(--handled);
+  background: var(--snoozed);
   opacity: 0;
   transition: opacity 0.1s;
   color: white;
@@ -155,11 +155,11 @@ html, body {
   font-weight: 600;
 }
 
-/* 왼쪽으로 밀면 콘텐츠가 왼쪽으로 이동 → 오른쪽부터 배경이 드러남 → 글자도 오른쪽 정렬 */
+/* 왼쪽으로 밀면 콘텐츠가 왼쪽으로 이동 → 오른쪽부터 배경이 드러남 → 글자도 오른쪽 정렬 (처리) */
 .item-bg-left {
   justify-content: flex-end;
   padding-right: 20px;
-  background: var(--snoozed);
+  background: var(--handled);
   opacity: 0;
   transition: opacity 0.1s;
   color: white;
@@ -191,6 +191,12 @@ html, body {
 }
 .chip-idea { background: rgba(45,91,255,0.12); color: var(--idea); }
 .chip-note { background: rgba(154,150,141,0.15); color: var(--muted); }
+
+.urgent-badge {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: #FFD27A;
+}
 
 .item-text {
   flex: 1;
@@ -278,13 +284,33 @@ html, body {
 }
 
 .popup-card {
+  position: relative;
   width: 86%;
   max-width: 360px;
   background: var(--bg);
   border-radius: 20px;
-  padding: 18px 16px 16px;
+  padding: 40px 16px 16px;
   box-shadow: 0 24px 60px rgba(0,0,0,0.3), 0 4px 14px rgba(0,0,0,0.14);
 }
+
+.urgent-star-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color 0.15s, transform 0.12s;
+}
+.urgent-star-btn:active { transform: scale(0.88); }
+.urgent-star-btn.active { color: #FFD27A; }
 
 .popup-textarea {
   width: 100%;
@@ -555,6 +581,13 @@ html, body {
 .detail-close-btn {
   font-size: 15px;
 }
+
+.urgent-toggle-btn {
+  min-width: 32px;
+  min-height: 32px;
+  padding: 4px;
+}
+.urgent-toggle-btn.active { color: #FFD27A; }
 
 .detail-popup-body {
   flex: 1;

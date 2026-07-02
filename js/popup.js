@@ -1,6 +1,7 @@
 import { saveItem, generateId } from './db.js';
 
 let currentType = 'note';
+let currentUrgent = false;
 let overlayEl = null;
 let textareaEl = null;
 let onCloseCallback = null;
@@ -8,11 +9,15 @@ let onCloseCallback = null;
 export function showPopup(source = 'icon', onClose) {
   onCloseCallback = onClose;
   currentType = 'note';
+  currentUrgent = false;
 
   overlayEl = document.createElement('div');
   overlayEl.className = 'popup-overlay';
   overlayEl.innerHTML = `
     <div class="popup-card" id="popup-card">
+      <button class="urgent-star-btn" id="urgent-toggle" aria-label="긴급 표시" title="긴급">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </button>
       <textarea class="popup-textarea" id="popup-ta" placeholder="지금 떠오른 것을 적어요" rows="4"></textarea>
       <div class="popup-chips">
         <button class="type-chip-btn active-note" id="chip-note">메모</button>
@@ -55,8 +60,16 @@ export function showPopup(source = 'icon', onClose) {
   overlayEl.querySelector('#chip-note').addEventListener('click', () => setType('note'));
   overlayEl.querySelector('#chip-idea').addEventListener('click', () => setType('idea'));
   overlayEl.querySelector('#popup-save').addEventListener('click', () => saveAndClose());
+  overlayEl.querySelector('#urgent-toggle').addEventListener('click', () => toggleUrgent());
 
   document.addEventListener('keydown', onKeyDown);
+}
+
+function toggleUrgent() {
+  currentUrgent = !currentUrgent;
+  const btn = overlayEl.querySelector('#urgent-toggle');
+  btn.classList.toggle('active', currentUrgent);
+  btn.querySelector('path').setAttribute('fill', currentUrgent ? '#FFD27A' : 'none');
 }
 
 function setType(type) {
@@ -86,6 +99,7 @@ async function saveAndClose() {
       createdAt: new Date().toISOString(),
       status: 'unhandled',
       type: currentType,
+      urgent: currentUrgent,
     };
     await saveItem(item);
   }

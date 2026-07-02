@@ -5,8 +5,8 @@ import { setupPullToRefresh } from './gestures.js';
 import { showConfirm } from './confirm.js';
 import { haptic } from './haptics.js';
 
-const SWIPE_THRESHOLD = 72;
-const CONFIRM_THRESHOLD = 120;
+const SWIPE_THRESHOLD = 56;
+const CONFIRM_THRESHOLD = 90;
 
 export async function renderInbox() {
   const items = await getInboxItems();
@@ -86,19 +86,22 @@ export async function renderInbox() {
 }
 
 function groupByDate(items) {
+  const urgent = items.filter(i => i.urgent);
+  const rest = items.filter(i => !i.urgent);
+
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const weekStart = new Date(todayStart);
   weekStart.setDate(todayStart.getDate() - todayStart.getDay());
 
   const today = [], thisWeek = [], older = [];
-  for (const item of items) {
+  for (const item of rest) {
     const d = new Date(item.createdAt);
     if (d >= todayStart) today.push(item);
     else if (d >= weekStart) thisWeek.push(item);
     else older.push(item);
   }
-  return [['오늘', today], ['이번 주', thisWeek], ['오래됨', older]];
+  return [['🌟 긴급', urgent], ['오늘', today], ['이번 주', thisWeek], ['오래됨', older]];
 }
 
 function buildItemRow(item) {
@@ -111,10 +114,11 @@ function buildItemRow(item) {
   const dateStr = formatDate(item.createdAt);
 
   row.innerHTML = `
-    <div class="item-bg item-bg-right">처리 ✓</div>
-    <div class="item-bg item-bg-left">보류 ⏰</div>
+    <div class="item-bg item-bg-right">보류 ⏰</div>
+    <div class="item-bg item-bg-left">처리 ✓</div>
     <div class="item-content">
       <span class="item-type-chip ${chipClass}">${chipLabel}</span>
+      ${item.urgent ? '<span class="urgent-badge">★</span>' : ''}
       <div class="item-text">${escapeHtml(item.content)}</div>
       <span class="item-time">${dateStr}</span>
     </div>
@@ -172,13 +176,13 @@ function setupSwipe(row, content, bgRight, bgLeft, item) {
     bgRight.style.transition = 'opacity 0.2s';
     bgLeft.style.transition = 'opacity 0.2s';
 
-    if (dx > CONFIRM_THRESHOLD) {
-      content.style.transform = `translateX(110%)`;
+    if (dx < -CONFIRM_THRESHOLD) {
+      content.style.transform = `translateX(-110%)`;
       await new Promise(r => setTimeout(r, 180));
       await markHandled(item);
-    } else if (dx < -CONFIRM_THRESHOLD) {
+    } else if (dx > CONFIRM_THRESHOLD) {
       content.style.transform = 'translateX(0)';
-      bgLeft.style.opacity = 0;
+      bgRight.style.opacity = 0;
       showSnoozeModal(item, () => renderInbox());
     } else {
       content.style.transform = 'translateX(0)';
