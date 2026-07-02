@@ -69,11 +69,10 @@ function renderCard(item) {
     <div class="detail-popup-card">
       <div class="detail-popup-top">
         <span class="detail-type-chip item-type-chip ${chipClass}" id="type-toggle">${chipLabel}</span>
+        <span class="detail-popup-date">${dateStr}</span>
         <button class="icon-btn urgent-toggle-btn ${item.urgent ? 'active' : ''}" id="urgent-toggle" aria-label="긴급 표시" title="긴급">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="${item.urgent ? '#FFD27A' : 'none'}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
         </button>
-        <span class="detail-popup-date">${dateStr}</span>
-        <button class="icon-btn detail-close-btn" id="detail-close">✕</button>
       </div>
       <div class="detail-popup-body">
         <textarea class="detail-content" id="detail-content-input" rows="1">${escapeHtml(item.content)}</textarea>
@@ -101,8 +100,6 @@ function renderCard(item) {
   const textarea = overlayEl.querySelector('#detail-content-input');
   autoGrow(textarea);
   textarea.addEventListener('input', () => autoGrow(textarea));
-
-  overlayEl.querySelector('#detail-close').addEventListener('click', () => closeWithSave());
 
   overlayEl.querySelector('#d-develop').addEventListener('click', async (e) => {
     syncContentEdit(item);
