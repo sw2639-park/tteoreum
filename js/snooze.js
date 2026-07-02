@@ -1,4 +1,5 @@
 import { saveItem } from './db.js';
+import { haptic } from './haptics.js';
 
 export function showSnoozeModal(item, onDone) {
   const overlay = document.createElement('div');
@@ -54,6 +55,7 @@ export function showSnoozeModal(item, onDone) {
 }
 
 async function snoozeItem(item, dateStr) {
+  haptic();
   item.status = 'snoozed';
   item.snoozeUntil = new Date(dateStr).toISOString();
   await saveItem(item);

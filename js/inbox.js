@@ -3,6 +3,7 @@ import { showPopup } from './popup.js';
 import { showSnoozeModal } from './snooze.js';
 import { setupPullToRefresh } from './gestures.js';
 import { showConfirm } from './confirm.js';
+import { haptic } from './haptics.js';
 
 const SWIPE_THRESHOLD = 72;
 const CONFIRM_THRESHOLD = 120;
@@ -201,6 +202,7 @@ function setupLongPress(row, item) {
       timer = null;
       const ok = await showConfirm('이 항목을 휴지통으로 보낼까요?', '휴지통으로', '취소');
       if (ok) {
+        haptic();
         item.status = 'discarded';
         item.discardedAt = new Date().toISOString();
         await saveItem(item);
@@ -214,6 +216,7 @@ function setupLongPress(row, item) {
 }
 
 async function markHandled(item) {
+  haptic();
   item.status = 'handled';
   item.handledAt = new Date().toISOString();
   await saveItem(item);

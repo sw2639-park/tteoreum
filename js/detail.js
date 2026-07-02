@@ -2,6 +2,7 @@ import { getItem, saveItem } from './db.js';
 import { showSnoozeModal } from './snooze.js';
 import { setupSwipeBack } from './gestures.js';
 import { pushScreen } from './nav.js';
+import { haptic } from './haptics.js';
 
 const RELAY = 'https://tteoreum-relay.vercel.app';
 
@@ -132,6 +133,7 @@ function renderCard(item) {
 
   overlayEl.querySelector('#d-handle').addEventListener('click', async () => {
     syncContentEdit(item);
+    haptic();
     item.status = 'handled';
     item.handledAt = new Date().toISOString();
     await saveItem(item);
@@ -145,6 +147,7 @@ function renderCard(item) {
 
   overlayEl.querySelector('#d-discard').addEventListener('click', async () => {
     syncContentEdit(item);
+    haptic();
     item.status = 'discarded';
     item.discardedAt = new Date().toISOString();
     await saveItem(item);
