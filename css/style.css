@@ -194,7 +194,10 @@ html, body {
 
 .urgent-badge {
   flex-shrink: 0;
+  width: 13px;
+  text-align: center;
   font-size: 13px;
+  line-height: 1.5;
   color: #FFD27A;
 }
 

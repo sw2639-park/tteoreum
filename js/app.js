@@ -5,25 +5,25 @@ import { initPush, showQuickCaptureNotification } from './push.js';
 import { activateScreen, replaceScreen } from './nav.js';
 import { setupSwipeForward } from './gestures.js';
 
-// 헤더 아이콘 순서(그래프 → 완료함 → 휴지통)대로 왼쪽 스와이프 이동.
+// 헤더 아이콘 순서(완료함 → 그래프 → 휴지통)대로 왼쪽 스와이프 이동.
 // 옆으로 이동은 replaceScreen을 써서 히스토리를 쌓지 않으므로,
 // 드래그백(오른쪽 스와이프)은 어디서든 메인화면으로 바로 돌아감.
 function setupPageSwipes() {
   setupSwipeForward(document.getElementById('inbox-screen'), () => {
-    import('./graph.js').then(m => m.showGraph());
+    import('./handled.js').then(m => m.showHandled());
   }, '.item-row, .icon-btn, .fab');
 
-  setupSwipeForward(document.getElementById('graph-screen'), async () => {
-    replaceScreen({ screen: 'handled' });
-    const m = await import('./handled.js');
-    await m.renderHandledScreen();
-  }, '#graph-svg');
-
   setupSwipeForward(document.getElementById('handled-screen'), async () => {
+    replaceScreen({ screen: 'graph' });
+    const m = await import('./graph.js');
+    await m.renderGraphScreen();
+  }, '.handled-item, .icon-btn');
+
+  setupSwipeForward(document.getElementById('graph-screen'), async () => {
     replaceScreen({ screen: 'trash' });
     const m = await import('./trash.js');
     await m.renderTrashScreen();
-  }, '.handled-item, .icon-btn');
+  }, '#graph-svg');
 }
 
 async function route(state) {
