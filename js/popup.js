@@ -62,7 +62,51 @@ export function showPopup(source = 'icon', onClose) {
   overlayEl.querySelector('#popup-save').addEventListener('click', () => saveAndClose());
   overlayEl.querySelector('#urgent-toggle').addEventListener('click', () => toggleUrgent());
 
+  setupSwipeToClose(overlayEl.querySelector('#popup-card'));
+
   document.addEventListener('keydown', onKeyDown);
+}
+
+// 오른쪽에서 왼쪽으로 밀면 카드가 밀려나가며 닫힘 (저장 포함)
+function setupSwipeToClose(card) {
+  const THRESHOLD = 80;
+  let startX = 0, startY = 0, dx = 0, dragging = false, locked = false;
+
+  card.addEventListener('touchstart', (e) => {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+    dx = 0;
+    dragging = false;
+    locked = false;
+  }, { passive: true });
+
+  card.addEventListener('touchmove', (e) => {
+    const x = e.touches[0].clientX;
+    const y = e.touches[0].clientY;
+    if (!dragging) {
+      if (Math.abs(x - startX) < 8 && Math.abs(y - startY) < 8) return;
+      if (Math.abs(y - startY) > Math.abs(x - startX)) { locked = true; return; }
+      dragging = true;
+    }
+    if (locked) return;
+    dx = Math.min(x - startX, 0); // 왼쪽으로 미는 동작만 반응
+    card.style.transform = `translateX(${dx}px)`;
+    card.style.opacity = String(Math.max(1 - Math.abs(dx) / 240, 0.4));
+  }, { passive: true });
+
+  card.addEventListener('touchend', () => {
+    if (!dragging || locked) return;
+    card.style.transition = 'transform 0.2s ease, opacity 0.2s ease';
+    if (dx < -THRESHOLD) {
+      card.style.transform = 'translateX(-120%)';
+      card.style.opacity = '0';
+      setTimeout(() => saveAndClose(), 180);
+    } else {
+      card.style.transform = 'translateX(0)';
+      card.style.opacity = '1';
+      setTimeout(() => { card.style.transition = ''; }, 200);
+    }
+  });
 }
 
 function toggleUrgent() {

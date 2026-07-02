@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tteoreum-v24';
+const CACHE_NAME = 'tteoreum-v25';
 const ASSETS = [
   '/',
   '/index.html',
@@ -127,8 +127,12 @@ async function openOrFocus(url) {
   const allClients = await clients.matchAll({ type: 'window', includeUncontrolled: true });
   for (const client of allClients) {
     if ('navigate' in client && 'focus' in client) {
-      await client.navigate(url);
-      return client.focus();
+      try {
+        await client.navigate(url);
+        return await client.focus();
+      } catch (err) {
+        // 정지되어 있거나 이동 불가능한 클라이언트일 수 있음 — 다음 방법으로 폴백
+      }
     }
   }
   return clients.openWindow(url);
