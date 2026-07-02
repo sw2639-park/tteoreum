@@ -39,14 +39,21 @@ export async function renderGraphScreen() {
   const allItems = await getAllItems();
   const active = allItems.filter(i => i.status !== 'discarded');
 
-  // 태그 없는 항목 자동 태깅 (배치)
+  // 태그 없는 항목 자동 태깅 (배치) — 기존 태그 어휘를 함께 보내 재사용 유도 (연결 잘 되게)
   const untagged = active.filter(i => !i.tags || i.tags.length === 0);
   if (untagged.length > 0) {
+    const tagCounts = {};
+    active.forEach(i => (i.tags || []).forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; }));
+    const existingTags = Object.keys(tagCounts).sort((a, b) => tagCounts[b] - tagCounts[a]);
+
     try {
       const res = await fetch(`${RELAY}/api/tag`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ items: untagged.map(i => ({ id: i.id, content: i.content })) }),
+        body: JSON.stringify({
+          items: untagged.map(i => ({ id: i.id, content: i.content })),
+          existingTags,
+        }),
       });
       if (res.ok) {
         const { result } = await res.json();
@@ -133,7 +140,7 @@ function buildGraph(items) {
   });
 
   function restColor(id) {
-    if (degree[id] === 0) return '#5A5F75';
+    if (degree[id] === 0) return '#9AA2C4';
     const fam = nodeFamily[id];
     if (nodeIsHub[id]) return fam;
     return d3.interpolateRgb(fam, STAR)(0.6);
@@ -142,13 +149,13 @@ function buildGraph(items) {
   const svg = d3.select('#graph-svg');
   svg.selectAll('*').remove();
 
-  // 별빛 배경 점
+  // 별빛 배경 점 (데이터 별과 구분되게 더 은은하게)
   const starsLayer = svg.append('g');
   for (let i = 0; i < 55; i++) {
     starsLayer.append('circle')
       .attr('cx', Math.random() * W).attr('cy', Math.random() * H)
       .attr('r', 0.5 + Math.random() * 1.1)
-      .attr('fill', STAR).attr('opacity', 0.25 + Math.random() * 0.4)
+      .attr('fill', STAR).attr('opacity', 0.12 + Math.random() * 0.2)
       .style('animation', `twinkle ${2 + Math.random() * 3}s ease-in-out ${Math.random() * 3}s infinite`);
   }
 
@@ -168,13 +175,13 @@ function buildGraph(items) {
     .attr('class', 'node').style('cursor', 'pointer');
 
   const glow = nodeSel.append('circle')
-    .attr('r', d => (9 + Math.min(degree[d.id], 4) * 2.6) * (nodeIsHub[d.id] ? 2.1 : 1.7))
+    .attr('r', d => (11 + Math.min(degree[d.id], 4) * 2.6) * (nodeIsHub[d.id] ? 2.1 : 1.7))
     .attr('fill', d => restColor(d.id))
-    .attr('opacity', d => degree[d.id] === 0 ? 0.08 : (nodeIsHub[d.id] ? 0.3 : 0.18))
+    .attr('opacity', d => degree[d.id] === 0 ? 0.22 : (nodeIsHub[d.id] ? 0.35 : 0.22))
     .attr('filter', 'url(#starglow)');
 
   const core = nodeSel.append('circle')
-    .attr('r', d => (4.5 + Math.min(degree[d.id], 4) * 2.2) * (nodeIsHub[d.id] ? 1.25 : 1))
+    .attr('r', d => (6 + Math.min(degree[d.id], 4) * 2.2) * (nodeIsHub[d.id] ? 1.25 : 1))
     .attr('fill', d => restColor(d.id)).attr('opacity', 0)
     .style('animation', (d, i) => `twinkle ${3 + (i % 5) * 0.5}s ease-in-out ${(i % 7) * 0.4}s infinite`)
     .style('transform-box', 'fill-box').style('transform-origin', 'center');
@@ -197,7 +204,7 @@ function buildGraph(items) {
     });
 
   core.transition().delay((d, i) => i * 80).duration(600)
-    .ease(d3.easeBackOut.overshoot(1.6)).attr('opacity', 0.85);
+    .ease(d3.easeBackOut.overshoot(1.6)).attr('opacity', 0.95);
 
   nodeSel.call(d3.drag()
     .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.25).restart(); d.fx = d.x; d.fy = d.y; })
