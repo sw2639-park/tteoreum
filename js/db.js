@@ -65,11 +65,17 @@ export async function deleteItem(id) {
   });
 }
 
+// 인박스에 보여줄 항목: 미처리 항목 + 오늘 처리된 항목(취소선으로 하단에 표시,
+// 자정 지나면 자연스럽게 빠지고 완료함에서만 조회됨)
 export async function getInboxItems() {
   const all = await getAllItems();
   const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   return all.filter(item => {
-    if (item.status === 'discarded' || item.status === 'handled') return false;
+    if (item.status === 'discarded') return false;
+    if (item.status === 'handled') {
+      return item.handledAt && new Date(item.handledAt) >= todayStart;
+    }
     if (item.status === 'snoozed') {
       return item.snoozeUntil && new Date(item.snoozeUntil) <= now;
     }
@@ -94,5 +100,5 @@ export async function purgeOldDiscarded() {
 
 export async function countUnhandled() {
   const items = await getInboxItems();
-  return items.length;
+  return items.filter(i => i.status !== 'handled').length;
 }

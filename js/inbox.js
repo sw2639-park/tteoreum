@@ -13,7 +13,7 @@ export async function renderInbox() {
   items.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
 
   const screen = document.getElementById('inbox-screen');
-  const unhandledCount = items.length;
+  const unhandledCount = items.filter(i => i.status !== 'handled').length;
   const allHandled = (await getAllItems()).filter(i => i.status === 'handled').length;
   const total = unhandledCount + allHandled;
   const rate = total > 0 ? Math.round((allHandled / total) * 100) : 0;
@@ -86,8 +86,12 @@ export async function renderInbox() {
 }
 
 function groupByDate(items) {
-  const urgent = items.filter(i => i.urgent);
-  const rest = items.filter(i => !i.urgent);
+  const doneToday = items.filter(i => i.status === 'handled')
+    .sort((a, b) => new Date(a.handledAt) - new Date(b.handledAt));
+  const pending = items.filter(i => i.status !== 'handled');
+
+  const urgent = pending.filter(i => i.urgent);
+  const rest = pending.filter(i => !i.urgent);
 
   const now = new Date();
   const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -101,10 +105,12 @@ function groupByDate(items) {
     else if (d >= weekStart) thisWeek.push(item);
     else older.push(item);
   }
-  return [['🌟 긴급', urgent], ['오늘', today], ['이번 주', thisWeek], ['오래됨', older]];
+  return [['🌟 긴급', urgent], ['오늘', today], ['이번 주', thisWeek], ['오래됨', older], ['완료', doneToday]];
 }
 
 function buildItemRow(item) {
+  if (item.status === 'handled') return buildDoneRow(item);
+
   const row = document.createElement('div');
   row.className = 'item-row';
   row.dataset.id = item.id;
@@ -135,6 +141,55 @@ function buildItemRow(item) {
   });
 
   return row;
+}
+
+// 오늘 처리된 항목: 취소선으로 하단에 표시, 길게 누르면 되돌리기 (스와이프 없음)
+function buildDoneRow(item) {
+  const row = document.createElement('div');
+  row.className = 'item-row';
+  row.dataset.id = item.id;
+
+  const chipClass = item.type === 'idea' ? 'chip-idea' : 'chip-note';
+  const chipLabel = item.type === 'idea' ? '아이디어' : '메모';
+  const dateStr = formatDate(item.createdAt);
+
+  row.innerHTML = `
+    <div class="item-content item-content-done">
+      <span class="item-type-chip ${chipClass}">${chipLabel}</span>
+      <span class="urgent-badge">${item.urgent ? '★' : ''}</span>
+      <div class="item-text item-text-done">${escapeHtml(item.content)}</div>
+      <span class="item-time">${dateStr}</span>
+    </div>
+  `;
+
+  const content = row.querySelector('.item-content');
+  setupUndoLongPress(content, item);
+  content.addEventListener('click', () => {
+    import('./detail.js').then(m => m.showDetail(item.id));
+  });
+
+  return row;
+}
+
+function setupUndoLongPress(content, item) {
+  let timer = null;
+
+  content.addEventListener('touchstart', () => {
+    timer = setTimeout(async () => {
+      timer = null;
+      const ok = await showConfirm('처리를 취소하고 되돌릴까요?', '되돌리기', '취소');
+      if (ok) {
+        haptic();
+        item.status = 'unhandled';
+        delete item.handledAt;
+        await saveItem(item);
+        renderInbox();
+      }
+    }, 600);
+  }, { passive: true });
+
+  content.addEventListener('touchend', () => { clearTimeout(timer); timer = null; });
+  content.addEventListener('touchmove', () => { clearTimeout(timer); timer = null; });
 }
 
 function setupSwipe(row, content, bgRight, bgLeft, item) {

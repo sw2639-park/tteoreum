@@ -216,6 +216,16 @@ html, body {
   overflow: hidden;
 }
 
+.item-content-done {
+  opacity: 0.6;
+}
+
+.item-text-done {
+  text-decoration: line-through;
+  text-decoration-color: var(--muted);
+  color: var(--muted);
+}
+
 .item-time {
   flex-shrink: 0;
   margin-top: 2px;
