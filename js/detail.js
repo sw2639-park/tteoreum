@@ -90,9 +90,14 @@ function renderCard(item) {
         ` : ''}
       </div>
       <div class="detail-actions">
-        <button class="action-btn handled-btn" id="d-handle">처리</button>
-        <button class="action-btn snooze-btn-d" id="d-snooze">보류</button>
-        <button class="action-btn discard-btn" id="d-discard">폐기</button>
+        ${item.status === 'handled' ? `
+          <button class="action-btn snooze-btn-d" id="d-undo">되돌리기</button>
+          <button class="action-btn discard-btn" id="d-discard">폐기</button>
+        ` : `
+          <button class="action-btn handled-btn" id="d-handle">처리</button>
+          <button class="action-btn snooze-btn-d" id="d-snooze">보류</button>
+          <button class="action-btn discard-btn" id="d-discard">폐기</button>
+        `}
       </div>
     </div>
   `;
@@ -138,7 +143,7 @@ function renderCard(item) {
     renderCard(item);
   });
 
-  overlayEl.querySelector('#d-handle').addEventListener('click', async () => {
+  overlayEl.querySelector('#d-handle')?.addEventListener('click', async () => {
     syncContentEdit(item);
     haptic();
     item.status = 'handled';
@@ -147,9 +152,18 @@ function renderCard(item) {
     history.back();
   });
 
-  overlayEl.querySelector('#d-snooze').addEventListener('click', () => {
+  overlayEl.querySelector('#d-snooze')?.addEventListener('click', () => {
     syncContentEdit(item);
     showSnoozeModal(item, () => history.back());
+  });
+
+  overlayEl.querySelector('#d-undo')?.addEventListener('click', async () => {
+    syncContentEdit(item);
+    haptic();
+    item.status = 'unhandled';
+    delete item.handledAt;
+    await saveItem(item);
+    history.back();
   });
 
   overlayEl.querySelector('#d-discard').addEventListener('click', async () => {
