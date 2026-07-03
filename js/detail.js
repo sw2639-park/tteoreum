@@ -70,6 +70,11 @@ function renderCard(item) {
       <div class="detail-popup-top">
         <span class="detail-type-chip item-type-chip ${chipClass}" id="type-toggle">${chipLabel}</span>
         <span class="detail-popup-date">${dateStr}</span>
+        ${item.type === 'idea' ? `
+          <button class="icon-btn develop-icon-btn" id="d-develop" aria-label="발전" title="발전">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        ` : ''}
         <button class="icon-btn urgent-toggle-btn ${item.urgent ? 'active' : ''}" id="urgent-toggle" aria-label="긴급 표시" title="긴급">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="${item.urgent ? '#FFD27A' : 'none'}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
         </button>
@@ -81,7 +86,6 @@ function renderCard(item) {
             ${item.tags.map(t => `<span class="tag-chip">#${escapeHtml(t)}</span>`).join('')}
           </div>
         ` : ''}
-        ${item.type === 'idea' ? '<button class="develop-btn" id="d-develop">✨ 발전</button>' : ''}
         ${item.aiSummary ? `
           <div class="ai-summary">
             <div class="ai-summary-label">발전 결과</div>
@@ -110,7 +114,8 @@ function renderCard(item) {
     syncContentEdit(item);
     const btn = e.currentTarget;
     btn.disabled = true;
-    btn.textContent = '생각하는 중…';
+    btn.classList.add('loading');
+    btn.title = '생각하는 중…';
     try {
       const res = await fetch(`${RELAY}/api/develop`, {
         method: 'POST',
@@ -124,7 +129,8 @@ function renderCard(item) {
       renderCard(item);
     } catch (err) {
       btn.disabled = false;
-      btn.textContent = '✨ 발전';
+      btn.classList.remove('loading');
+      btn.title = '발전';
       console.warn('develop failed:', err.message);
     }
   });

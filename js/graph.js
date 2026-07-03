@@ -188,7 +188,8 @@ function buildGraph(items) {
   goldF.append('feGaussianBlur').attr('stdDeviation', 8);
 
   const g = svg.append('g');
-  svg.call(d3.zoom().scaleExtent([0.5, 2.5]).on('zoom', e => g.attr('transform', e.transform)));
+  const zoomBehavior = d3.zoom().scaleExtent([0.15, 2.5]).on('zoom', e => g.attr('transform', e.transform));
+  svg.call(zoomBehavior);
 
   const linkSel = g.append('g').selectAll('line').data(links).join('line')
     .attr('stroke', 'rgba(217,230,255,0.16)').attr('stroke-width', 1);
@@ -215,8 +216,6 @@ function buildGraph(items) {
     .style('paint-order', 'stroke').style('pointer-events', 'none')
     .style('font-family', '-apple-system, sans-serif');
 
-  const PAD = 24;
-
   const sim = d3.forceSimulation(nodes)
     .force('link', d3.forceLink(links).id(d => d.id).distance(100).strength(0.5))
     .force('charge', d3.forceManyBody().strength(-220))
@@ -226,15 +225,30 @@ function buildGraph(items) {
     .force('collide', d3.forceCollide(d => 26 + Math.min(degree[d.id], 4) * 2.6))
     .alphaDecay(0.03)
     .on('tick', () => {
-      // 화면 밖으로 밀려나 안 보이는 별이 생기지 않도록 경계 안에 고정
-      nodes.forEach(d => {
-        d.x = Math.max(PAD, Math.min(W - PAD, d.x));
-        d.y = Math.max(PAD, Math.min(H - PAD, d.y));
-      });
       linkSel.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
              .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
       nodeSel.attr('transform', d => `translate(${d.x},${d.y})`);
-    });
+    })
+    .on('end', () => fitToView());
+
+  // 별자리가 다 퍼진 뒤 전체가 한 화면에 들어오도록 자동 줌아웃
+  // (메모가 늘어나 별자리가 커져도 화면 밖으로 사라지는 별이 없게)
+  function fitToView() {
+    const xs = nodes.map(d => d.x), ys = nodes.map(d => d.y);
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const graphW = Math.max(maxX - minX, 1);
+    const graphH = Math.max(maxY - minY, 1);
+    const pad = 50;
+    const scale = Math.min((W - pad * 2) / graphW, (H - pad * 2) / graphH, 1);
+    const scaleClamped = Math.max(scale, 0.15);
+    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+    const transform = d3.zoomIdentity
+      .translate(W / 2, H / 2)
+      .scale(scaleClamped)
+      .translate(-cx, -cy);
+    svg.transition().duration(600).call(zoomBehavior.transform, transform);
+  }
 
   core.transition().delay((d, i) => i * 80).duration(600)
     .ease(d3.easeBackOut.overshoot(1.6)).attr('opacity', 0.95);
