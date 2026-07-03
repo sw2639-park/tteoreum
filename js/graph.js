@@ -161,6 +161,18 @@ function buildGraph(items) {
     c.members.forEach(id => { nodeFamily[id] = color; nodeIsHub[id] = (id === c.hub); });
   });
 
+  // 클러스터 이름: 구성원들이 가장 많이 공유하는 태그를 별자리 이름으로 사용
+  const clusterName = {};
+  clusters.forEach(c => {
+    const tagCounts = {};
+    c.members.forEach(id => {
+      const n = nodes.find(nn => nn.id === id);
+      (n.tags || []).forEach(t => { tagCounts[t] = (tagCounts[t] || 0) + 1; });
+    });
+    const sorted = Object.entries(tagCounts).sort((a, b) => b[1] - a[1]);
+    clusterName[c.hub] = sorted[0]?.[0] || null;
+  });
+
   function restColor(id) {
     if (degree[id] === 0) return '#9AA2C4';
     const fam = nodeFamily[id];
@@ -216,6 +228,17 @@ function buildGraph(items) {
     .style('paint-order', 'stroke').style('pointer-events', 'none')
     .style('font-family', '-apple-system, sans-serif');
 
+  // 구심점 위에 별자리 이름(공유 태그) 항상 표시 — 별 묶음을 한눈에 구분
+  const clusterLabels = nodeSel.filter(d => nodeIsHub[d.id] && degree[d.id] > 0 && clusterName[d.id])
+    .append('text').text(d => `✦ ${clusterName[d.id]}`)
+    .attr('font-size', 11).attr('font-weight', 600)
+    .attr('dy', d => -(26 + Math.min(degree[d.id], 4) * 2.2))
+    .attr('text-anchor', 'middle').attr('opacity', 0)
+    .attr('fill', d => nodeFamily[d.id])
+    .attr('stroke', 'rgba(6,8,20,0.85)').attr('stroke-width', 3)
+    .style('paint-order', 'stroke').style('pointer-events', 'none')
+    .style('font-family', '-apple-system, sans-serif');
+
   const sim = d3.forceSimulation(nodes)
     .force('link', d3.forceLink(links).id(d => d.id).distance(100).strength(0.5))
     .force('charge', d3.forceManyBody().strength(-220))
@@ -239,8 +262,8 @@ function buildGraph(items) {
     const minY = Math.min(...ys), maxY = Math.max(...ys);
     const graphW = Math.max(maxX - minX, 1);
     const graphH = Math.max(maxY - minY, 1);
-    const pad = 50;
-    const scale = Math.min((W - pad * 2) / graphW, (H - pad * 2) / graphH, 1);
+    const pad = 70;
+    const scale = Math.min((W - pad * 2) / graphW, (H - pad * 2) / graphH, 0.85);
     const scaleClamped = Math.max(scale, 0.15);
     const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
     const transform = d3.zoomIdentity
@@ -250,8 +273,28 @@ function buildGraph(items) {
     svg.transition().duration(600).call(zoomBehavior.transform, transform);
   }
 
+  // 탭한 별(+ 연결된 별들)이 화면을 채우도록 살짝 확대
+  function zoomToFocus(id) {
+    const keep = neighborsOf(id);
+    const relevant = nodes.filter(n => keep.has(n.id));
+    const xs = relevant.map(n => n.x), ys = relevant.map(n => n.y);
+    const minX = Math.min(...xs), maxX = Math.max(...xs);
+    const minY = Math.min(...ys), maxY = Math.max(...ys);
+    const w = Math.max(maxX - minX, 40), h = Math.max(maxY - minY, 40);
+    const pad = 80;
+    const scale = Math.min((W - pad * 2) / w, (H - pad * 2) / h, 2.2);
+    const scaleClamped = Math.max(scale, 0.6);
+    const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
+    const transform = d3.zoomIdentity
+      .translate(W / 2, H / 2)
+      .scale(scaleClamped)
+      .translate(-cx, -cy);
+    svg.transition().duration(500).call(zoomBehavior.transform, transform);
+  }
+
   core.transition().delay((d, i) => i * 80).duration(600)
     .ease(d3.easeBackOut.overshoot(1.6)).attr('opacity', 0.95);
+  clusterLabels.transition().delay((d, i) => i * 80 + 300).duration(500).attr('opacity', 0.8);
 
   nodeSel.call(d3.drag()
     .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.25).restart(); d.fx = d.x; d.fy = d.y; })
@@ -281,15 +324,16 @@ function buildGraph(items) {
         goDetail(d.item.id);
         return;
       }
-      tapTimer = setTimeout(() => { tapTimer = null; focused = null; applyFocus(); }, 350);
+      tapTimer = setTimeout(() => { tapTimer = null; focused = null; applyFocus(); fitToView(); }, 350);
     } else {
       focused = d.id;
       applyFocus();
+      zoomToFocus(d.id);
     }
   });
 
   svg.on('click', e => {
-    if (e.target.tagName === 'svg') { focused = null; applyFocus(); }
+    if (e.target.tagName === 'svg') { focused = null; applyFocus(); fitToView(); }
   });
 
   function applyFocus() {
@@ -299,12 +343,14 @@ function buildGraph(items) {
           .attr('opacity', d => degree[d.id] === 0 ? 0.08 : (nodeIsHub[d.id] ? 0.3 : 0.18))
           .attr('filter', 'url(#starglow)');
       labels.transition().duration(350).attr('opacity', 0);
+      clusterLabels.transition().duration(350).attr('opacity', 0.8);
       linkSel.transition().duration(350).attr('stroke', 'rgba(217,230,255,0.16)')
              .attr('stroke-width', 1).attr('stroke-dasharray', null);
       cancelAnimationFrame(_flowRAF);
       return;
     }
     const keep = neighborsOf(focused);
+    clusterLabels.transition().duration(350).attr('opacity', d => keep.has(d.id) ? 1 : 0.12);
     core.transition().duration(400)
       .attr('fill', d => keep.has(d.id) ? GOLD : restColor(d.id))
       .attr('opacity', d => keep.has(d.id) ? 1 : 0.1);
