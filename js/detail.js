@@ -81,7 +81,7 @@ function renderCard(item) {
             ${item.tags.map(t => `<span class="tag-chip">#${escapeHtml(t)}</span>`).join('')}
           </div>
         ` : ''}
-        <button class="develop-btn" id="d-develop">✨ 발전</button>
+        ${item.type === 'idea' ? '<button class="develop-btn" id="d-develop">✨ 발전</button>' : ''}
         ${item.aiSummary ? `
           <div class="ai-summary">
             <div class="ai-summary-label">발전 결과</div>
@@ -106,7 +106,7 @@ function renderCard(item) {
   autoGrow(textarea);
   textarea.addEventListener('input', () => autoGrow(textarea));
 
-  overlayEl.querySelector('#d-develop').addEventListener('click', async (e) => {
+  overlayEl.querySelector('#d-develop')?.addEventListener('click', async (e) => {
     syncContentEdit(item);
     const btn = e.currentTarget;
     btn.disabled = true;
