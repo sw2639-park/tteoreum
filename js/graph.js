@@ -215,13 +215,22 @@ function buildGraph(items) {
     .style('paint-order', 'stroke').style('pointer-events', 'none')
     .style('font-family', '-apple-system, sans-serif');
 
+  const PAD = 24;
+
   const sim = d3.forceSimulation(nodes)
     .force('link', d3.forceLink(links).id(d => d.id).distance(100).strength(0.5))
     .force('charge', d3.forceManyBody().strength(-220))
     .force('center', d3.forceCenter(W / 2, H / 2))
+    .force('x', d3.forceX(W / 2).strength(0.04))
+    .force('y', d3.forceY(H / 2).strength(0.04))
     .force('collide', d3.forceCollide(d => 26 + Math.min(degree[d.id], 4) * 2.6))
     .alphaDecay(0.03)
     .on('tick', () => {
+      // 화면 밖으로 밀려나 안 보이는 별이 생기지 않도록 경계 안에 고정
+      nodes.forEach(d => {
+        d.x = Math.max(PAD, Math.min(W - PAD, d.x));
+        d.y = Math.max(PAD, Math.min(H - PAD, d.y));
+      });
       linkSel.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
              .attr('x2', d => d.target.x).attr('y2', d => d.target.y);
       nodeSel.attr('transform', d => `translate(${d.x},${d.y})`);
