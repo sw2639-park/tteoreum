@@ -43,16 +43,20 @@ async function renderTrashList() {
 
   for (const item of items) {
     const daysLeft = getDaysLeft(item.discardedAt);
+    const chipClass = item.type === 'idea' ? 'chip-idea' : 'chip-note';
+    const chipLabel = item.type === 'idea' ? '아이디어' : '메모';
     const el = document.createElement('div');
     el.className = 'trash-item';
     el.innerHTML = `
-      <div>
+      <span class="item-type-chip ${chipClass}">${chipLabel}</span>
+      <span class="urgent-badge">${item.urgent ? '★' : ''}</span>
+      <div class="trash-item-body">
         <div class="trash-item-text">${escapeHtml(item.content)}</div>
         <div class="trash-days">${daysLeft}일 후 삭제</div>
       </div>
-      <button class="restore-btn" data-id="${item.id}">복원</button>
+      <button class="restore-action-btn" data-id="${item.id}">복원</button>
     `;
-    el.querySelector('.restore-btn').addEventListener('click', async () => {
+    el.querySelector('.restore-action-btn').addEventListener('click', async () => {
       item.status = 'unhandled';
       delete item.discardedAt;
       await saveItem(item);

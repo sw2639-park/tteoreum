@@ -242,6 +242,20 @@ function buildGraph(items) {
 
   const core = nodeSel.selectAll('.core-shape');
 
+  // 긴급 표시된 항목은 금색 테두리로 표시 (인박스 별 배지와 동일 의미)
+  function coreRadius(d) {
+    return nodeIsHub[d.id]
+      ? (7 + Math.min(degree[d.id], 4) * 2.4) * 1.3
+      : (6 + Math.min(degree[d.id], 4) * 2.2) * sizeShrink(d);
+  }
+  const urgentRing = nodeSel.filter(d => d.item.urgent).append('circle')
+    .attr('class', 'urgent-ring')
+    .attr('r', d => coreRadius(d) + 4)
+    .attr('fill', 'none')
+    .attr('stroke', GOLD).attr('stroke-width', 1.4)
+    .attr('opacity', 0)
+    .style('pointer-events', 'none');
+
   const labels = nodeSel.append('text').text(d => d.label)
     .attr('font-size', 9.5).attr('dy', d => -(13 + Math.min(degree[d.id], 4) * 2.2))
     .attr('text-anchor', 'middle').attr('opacity', 0).attr('fill', '#EAEFFF')
@@ -316,6 +330,7 @@ function buildGraph(items) {
   core.transition().delay((d, i) => i * 80).duration(600)
     .ease(d3.easeBackOut.overshoot(1.6)).attr('opacity', 0.95);
   clusterLabels.transition().delay((d, i) => i * 80 + 300).duration(500).attr('opacity', 0.8);
+  urgentRing.transition().delay((d, i) => i * 80 + 200).duration(500).attr('opacity', 0.75);
 
   nodeSel.call(d3.drag()
     .on('start', (e, d) => { if (!e.active) sim.alphaTarget(0.25).restart(); d.fx = d.x; d.fy = d.y; })
@@ -365,6 +380,7 @@ function buildGraph(items) {
           .attr('filter', 'url(#starglow)');
       labels.transition().duration(350).attr('opacity', 0);
       clusterLabels.transition().duration(350).attr('opacity', 0.8);
+      urgentRing.transition().duration(350).attr('opacity', 0.75);
       linkSel.transition().duration(350).attr('stroke', 'rgba(217,230,255,0.16)')
              .attr('stroke-width', 1).attr('stroke-dasharray', null);
       cancelAnimationFrame(_flowRAF);
@@ -372,6 +388,7 @@ function buildGraph(items) {
     }
     const keep = neighborsOf(focused);
     clusterLabels.transition().duration(350).attr('opacity', d => keep.has(d.id) ? 1 : 0.12);
+    urgentRing.transition().duration(350).attr('opacity', d => keep.has(d.id) ? 0.9 : 0.08);
     core.transition().duration(400)
       .attr('fill', d => keep.has(d.id) ? GOLD : restColor(d.id))
       .attr('opacity', d => keep.has(d.id) ? 1 : 0.1);

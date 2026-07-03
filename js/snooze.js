@@ -31,22 +31,27 @@ export function showSnoozeModal(item, onDone) {
     });
   });
 
-  overlay.querySelector('#custom-snooze').addEventListener('click', () => {
-    const input = document.createElement('input');
-    input.type = 'date';
-    input.min = addDays(1).slice(0, 10);
-    input.style.cssText = 'position:fixed;opacity:0;pointer-events:none';
-    document.body.appendChild(input);
-    input.showPicker?.();
-    input.addEventListener('change', async () => {
-      if (input.value) {
-        await snoozeItem(item, input.value + 'T07:00:00');
-        overlay.remove();
-        input.remove();
-        onDone();
-      }
+  overlay.querySelector('#custom-snooze').addEventListener('click', (e) => {
+    const btn = e.currentTarget;
+    if (document.getElementById('custom-date-row')) return;
+
+    const row = document.createElement('div');
+    row.className = 'custom-date-row';
+    row.id = 'custom-date-row';
+    row.innerHTML = `
+      <input type="date" id="custom-date-input" min="${localDateStr(1)}">
+      <button class="custom-date-confirm" id="custom-date-confirm">확인</button>
+    `;
+    btn.insertAdjacentElement('afterend', row);
+    const input = row.querySelector('#custom-date-input');
+    input.focus();
+
+    row.querySelector('#custom-date-confirm').addEventListener('click', async () => {
+      if (!input.value) return;
+      await snoozeItem(item, input.value + 'T07:00:00');
+      overlay.remove();
+      onDone();
     });
-    input.addEventListener('blur', () => { input.remove(); });
   });
 
   overlay.addEventListener('click', (e) => {
@@ -71,4 +76,13 @@ function addDays(n) {
 function fmtDate(iso) {
   const d = new Date(iso);
   return `${d.getMonth() + 1}/${d.getDate()}`;
+}
+
+function localDateStr(n) {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
 }

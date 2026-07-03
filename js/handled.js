@@ -49,13 +49,14 @@ async function renderHandledList() {
     el.className = 'handled-item';
     el.innerHTML = `
       <span class="item-type-chip ${chipClass}">${chipLabel}</span>
+      <span class="urgent-badge">${item.urgent ? '★' : ''}</span>
       <div class="handled-item-body">
         <div class="handled-item-text">${escapeHtml(item.content)}</div>
         <div class="handled-item-meta">${formatDate(item.handledAt)} 처리</div>
       </div>
-      <button class="reopen-btn" data-id="${item.id}">되돌리기</button>
+      <button class="restore-action-btn" data-id="${item.id}">되돌리기</button>
     `;
-    el.querySelector('.reopen-btn').addEventListener('click', async () => {
+    el.querySelector('.restore-action-btn').addEventListener('click', async () => {
       item.status = 'unhandled';
       delete item.handledAt;
       await saveItem(item);
