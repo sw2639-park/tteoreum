@@ -46,7 +46,7 @@ export async function renderInbox() {
       </div>
     </div>
     <div class="search-bar ${searchOpen ? 'active' : ''}" id="search-bar">
-      <input type="text" id="search-input" placeholder="메모 검색" value="${escapeHtml(searchQuery)}">
+      <input type="text" id="search-input" placeholder="메모 검색" value="${escapeHtml(searchQuery)}" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" name="tteoreum-search" inputmode="search">
       <button class="search-clear-btn" id="search-clear" aria-label="검색 지우기">✕</button>
     </div>
     <div class="inbox-list" id="inbox-list"></div>
