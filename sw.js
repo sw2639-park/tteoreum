@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tteoreum-v29';
+const CACHE_NAME = 'tteoreum-v30';
 const ASSETS = [
   '/',
   '/index.html',

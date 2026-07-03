@@ -835,6 +835,27 @@ html, body {
   color: rgba(235,240,255,0.9);
 }
 
+.graph-topbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.graph-retag-btn {
+  background: none;
+  border: none;
+  color: rgba(235,240,255,0.6);
+  font-size: 15px;
+  cursor: pointer;
+  min-width: 32px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+.graph-retag-btn:active { opacity: 0.7; }
+
 .nebula {
   position: absolute;
   border-radius: 50%;

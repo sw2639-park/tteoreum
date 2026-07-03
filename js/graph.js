@@ -1,5 +1,7 @@
 import { getAllItems, saveItem } from './db.js';
 import { activateScreen, pushScreen } from './nav.js';
+import { showConfirm } from './confirm.js';
+import { haptic } from './haptics.js';
 
 const RELAY = 'https://tteoreum-relay.vercel.app';
 const STAR = '#D9E6FF';
@@ -19,7 +21,10 @@ export async function renderGraphScreen() {
     <div class="graph-topbar">
       <button class="graph-back-btn" id="graph-back">← 인박스</button>
       <span class="graph-label">별자리</span>
-      <span class="graph-count" id="graph-count"></span>
+      <div class="graph-topbar-right">
+        <span class="graph-count" id="graph-count"></span>
+        <button class="graph-retag-btn" id="graph-retag" title="태그 다시 분류">↻</button>
+      </div>
     </div>
     <div class="nebula gn1"></div>
     <div class="nebula gn2"></div>
@@ -35,6 +40,18 @@ export async function renderGraphScreen() {
   `;
 
   document.getElementById('graph-back').addEventListener('click', () => history.back());
+  document.getElementById('graph-retag').addEventListener('click', async () => {
+    const ok = await showConfirm('모든 항목의 태그를 다시 분류할까요? 시간이 좀 걸릴 수 있어요.', '다시 분류', '취소');
+    if (!ok) return;
+    haptic();
+    const allItems = await getAllItems();
+    const active = allItems.filter(i => i.status !== 'discarded');
+    for (const item of active) {
+      item.tags = [];
+      await saveItem(item);
+    }
+    await renderGraphScreen();
+  });
 
   const allItems = await getAllItems();
   const active = allItems.filter(i => i.status !== 'discarded');
