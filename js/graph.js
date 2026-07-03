@@ -209,17 +209,38 @@ function buildGraph(items) {
   const nodeSel = g.append('g').selectAll('g.node').data(nodes).join('g')
     .attr('class', 'node').style('cursor', 'pointer');
 
+  // 연결된 별(허브 아님, degree>0)은 살짝 축소
+  function sizeShrink(d) {
+    return (!nodeIsHub[d.id] && degree[d.id] > 0) ? 0.85 : 1;
+  }
+
   const glow = nodeSel.append('circle')
-    .attr('r', d => (11 + Math.min(degree[d.id], 4) * 2.6) * (nodeIsHub[d.id] ? 2.1 : 1.7))
+    .attr('r', d => (11 + Math.min(degree[d.id], 4) * 2.6) * (nodeIsHub[d.id] ? 2.1 : 1.7) * sizeShrink(d))
     .attr('fill', d => restColor(d.id))
     .attr('opacity', d => degree[d.id] === 0 ? 0.22 : (nodeIsHub[d.id] ? 0.35 : 0.22))
     .attr('filter', 'url(#starglow)');
 
-  const core = nodeSel.append('circle')
-    .attr('r', d => (6 + Math.min(degree[d.id], 4) * 2.2) * (nodeIsHub[d.id] ? 1.25 : 1))
+  // 4방향 반짝임 모양 경로 생성 (구심점 전용)
+  function sparkPath(r) {
+    const k = r * 0.22;
+    return `M0 ${-r} L${k} ${-k} L${r} 0 L${k} ${k} L0 ${r} L${-k} ${k} L${-r} 0 L${-k} ${-k} Z`;
+  }
+
+  const coreCircle = nodeSel.filter(d => !nodeIsHub[d.id]).append('circle')
+    .attr('class', 'core-shape')
+    .attr('r', d => (6 + Math.min(degree[d.id], 4) * 2.2) * sizeShrink(d))
     .attr('fill', d => restColor(d.id)).attr('opacity', 0)
     .style('animation', (d, i) => `twinkle ${3 + (i % 5) * 0.5}s ease-in-out ${(i % 7) * 0.4}s infinite`)
     .style('transform-box', 'fill-box').style('transform-origin', 'center');
+
+  const coreSpark = nodeSel.filter(d => nodeIsHub[d.id]).append('path')
+    .attr('class', 'core-shape')
+    .attr('d', d => sparkPath((7 + Math.min(degree[d.id], 4) * 2.4) * 1.3))
+    .attr('fill', d => restColor(d.id)).attr('opacity', 0)
+    .style('animation', (d, i) => `twinkle ${3 + (i % 5) * 0.5}s ease-in-out ${(i % 7) * 0.4}s infinite`)
+    .style('transform-box', 'fill-box').style('transform-origin', 'center');
+
+  const core = nodeSel.selectAll('.core-shape');
 
   const labels = nodeSel.append('text').text(d => d.label)
     .attr('font-size', 9.5).attr('dy', d => -(13 + Math.min(degree[d.id], 4) * 2.2))
