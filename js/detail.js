@@ -72,7 +72,7 @@ function renderCard(item) {
         <span class="detail-popup-date">${dateStr}</span>
         ${item.type === 'idea' ? `
           <button class="icon-btn develop-icon-btn" id="d-develop" aria-label="발전" title="발전">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M3 12h3M18 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4M8 11a4 4 0 1 1 8 0c0 2-1.5 3-2 4.5a2 2 0 0 1-.5 1H10.5a2 2 0 0 1-.5-1c-.5-1.5-2-2.5-2-4.5Z"/><path d="M12 2v1.5M4.2 4.2l1 1M19.8 4.2l-1 1M2 11h1.5M20.5 11H22"/></svg>
           </button>
         ` : ''}
         <button class="icon-btn urgent-toggle-btn ${item.urgent ? 'active' : ''}" id="urgent-toggle" aria-label="긴급 표시" title="긴급">
