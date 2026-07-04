@@ -214,8 +214,13 @@ function buildGraph(items) {
     return (!nodeIsHub[d.id] && degree[d.id] > 0) ? 0.85 : 1;
   }
 
+  // 미연결(고립) 별은 존재감을 낮춰서 더 작게 — 연결됨=크고 밝음, 고립됨=작고 흐림 대비 강화
+  function isoScale(d) {
+    return degree[d.id] === 0 ? 0.55 : 1;
+  }
+
   const glow = nodeSel.append('circle')
-    .attr('r', d => (11 + Math.min(degree[d.id], 4) * 2.6) * (nodeIsHub[d.id] ? 1.5 : 1.25) * sizeShrink(d))
+    .attr('r', d => (11 + Math.min(degree[d.id], 4) * 2.6) * (nodeIsHub[d.id] ? 1.5 : 1.25) * sizeShrink(d) * isoScale(d))
     .attr('fill', d => restColor(d.id))
     .attr('opacity', d => degree[d.id] === 0 ? 0.16 : (nodeIsHub[d.id] ? 0.26 : 0.16))
     .attr('filter', 'url(#starglow)');
@@ -228,14 +233,14 @@ function buildGraph(items) {
 
   const coreCircle = nodeSel.filter(d => !nodeIsHub[d.id]).append('circle')
     .attr('class', 'core-shape')
-    .attr('r', d => (6 + Math.min(degree[d.id], 4) * 2.2) * sizeShrink(d))
+    .attr('r', d => (6 + Math.min(degree[d.id], 4) * 2.2) * sizeShrink(d) * isoScale(d))
     .attr('fill', d => restColor(d.id)).attr('opacity', 0)
     .style('animation', (d, i) => `twinkle ${3 + (i % 5) * 0.5}s ease-in-out ${(i % 7) * 0.4}s infinite`)
     .style('transform-box', 'fill-box').style('transform-origin', 'center');
 
   const coreSpark = nodeSel.filter(d => nodeIsHub[d.id]).append('path')
     .attr('class', 'core-shape')
-    .attr('d', d => sparkPath((7 + Math.min(degree[d.id], 4) * 2.4) * 1.3))
+    .attr('d', d => sparkPath((7 + Math.min(degree[d.id], 4) * 2.4) * 1.3 * isoScale(d)))
     .attr('fill', d => restColor(d.id)).attr('opacity', 0)
     .style('animation', (d, i) => `twinkle ${3 + (i % 5) * 0.5}s ease-in-out ${(i % 7) * 0.4}s infinite`)
     .style('transform-box', 'fill-box').style('transform-origin', 'center');
@@ -244,9 +249,9 @@ function buildGraph(items) {
 
   // 긴급 표시된 항목은 금색 테두리로 표시 (인박스 별 배지와 동일 의미)
   function coreRadius(d) {
-    return nodeIsHub[d.id]
+    return (nodeIsHub[d.id]
       ? (7 + Math.min(degree[d.id], 4) * 2.4) * 1.3
-      : (6 + Math.min(degree[d.id], 4) * 2.2) * sizeShrink(d);
+      : (6 + Math.min(degree[d.id], 4) * 2.2) * sizeShrink(d)) * isoScale(d);
   }
   const urgentRing = nodeSel.filter(d => d.item.urgent).append('circle')
     .attr('class', 'urgent-ring')
@@ -280,7 +285,7 @@ function buildGraph(items) {
     .force('center', d3.forceCenter(W / 2, H / 2))
     .force('x', d3.forceX(W / 2).strength(0.04))
     .force('y', d3.forceY(H / 2).strength(0.04))
-    .force('collide', d3.forceCollide(d => 26 + Math.min(degree[d.id], 4) * 2.6))
+    .force('collide', d3.forceCollide(d => (26 + Math.min(degree[d.id], 4) * 2.6) * (degree[d.id] === 0 ? 0.75 : 1)))
     .alphaDecay(0.03)
     .on('tick', () => {
       linkSel.attr('x1', d => d.source.x).attr('y1', d => d.source.y)
