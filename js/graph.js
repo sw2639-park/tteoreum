@@ -195,9 +195,9 @@ function buildGraph(items) {
 
   const defs = svg.append('defs');
   const glowF = defs.append('filter').attr('id', 'starglow').attr('x', '-300%').attr('y', '-300%').attr('width', '700%').attr('height', '700%');
-  glowF.append('feGaussianBlur').attr('stdDeviation', 5);
+  glowF.append('feGaussianBlur').attr('stdDeviation', 7);
   const goldF = defs.append('filter').attr('id', 'goldglow').attr('x', '-400%').attr('y', '-400%').attr('width', '900%').attr('height', '900%');
-  goldF.append('feGaussianBlur').attr('stdDeviation', 8);
+  goldF.append('feGaussianBlur').attr('stdDeviation', 10);
 
   const g = svg.append('g');
   const zoomBehavior = d3.zoom().scaleExtent([0.15, 2.5]).on('zoom', e => g.attr('transform', e.transform));
@@ -215,9 +215,9 @@ function buildGraph(items) {
   }
 
   const glow = nodeSel.append('circle')
-    .attr('r', d => (11 + Math.min(degree[d.id], 4) * 2.6) * (nodeIsHub[d.id] ? 2.1 : 1.7) * sizeShrink(d))
+    .attr('r', d => (11 + Math.min(degree[d.id], 4) * 2.6) * (nodeIsHub[d.id] ? 1.5 : 1.25) * sizeShrink(d))
     .attr('fill', d => restColor(d.id))
-    .attr('opacity', d => degree[d.id] === 0 ? 0.22 : (nodeIsHub[d.id] ? 0.35 : 0.22))
+    .attr('opacity', d => degree[d.id] === 0 ? 0.16 : (nodeIsHub[d.id] ? 0.26 : 0.16))
     .attr('filter', 'url(#starglow)');
 
   // 4방향 반짝임 모양 경로 생성 (구심점 전용)
@@ -376,7 +376,7 @@ function buildGraph(items) {
     if (!focused) {
       core.transition().duration(400).attr('fill', d => restColor(d.id)).attr('opacity', 0.85);
       glow.transition().duration(400).attr('fill', d => restColor(d.id))
-          .attr('opacity', d => degree[d.id] === 0 ? 0.08 : (nodeIsHub[d.id] ? 0.3 : 0.18))
+          .attr('opacity', d => degree[d.id] === 0 ? 0.08 : (nodeIsHub[d.id] ? 0.22 : 0.14))
           .attr('filter', 'url(#starglow)');
       labels.transition().duration(350).attr('opacity', 0);
       clusterLabels.transition().duration(350).attr('opacity', 0.8);
@@ -395,7 +395,7 @@ function buildGraph(items) {
     glow.transition().duration(400)
       .attr('fill', d => keep.has(d.id) ? GOLD : restColor(d.id))
       .attr('filter', d => keep.has(d.id) ? 'url(#goldglow)' : 'url(#starglow)')
-      .attr('opacity', d => keep.has(d.id) ? 0.55 : 0.03);
+      .attr('opacity', d => keep.has(d.id) ? 0.4 : 0.03);
     labels.transition().duration(350).attr('opacity', d => keep.has(d.id) ? 1 : 0);
     linkSel.transition().duration(350)
       .attr('stroke', l => {
