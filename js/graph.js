@@ -117,11 +117,15 @@ function buildGraph(items) {
   const H = svgEl.clientHeight || window.innerHeight;
 
   // 노드·링크 빌드
+  // x/y를 안 주면 D3 기본값(황금각 나선)으로 배치되어 고립 노드들이 부채꼴로 각 맞춰 보이는 문제가 있어
+  // 미리 무작위 위치로 흩어놓음 — 시뮬레이션이 자연스러운 위치로 다듬어줌
   const nodes = items.map(i => ({
     id: i.id,
     label: i.content.length > 12 ? i.content.slice(0, 12) + '…' : i.content,
     tags: i.tags || [],
     item: i,
+    x: W / 2 + (Math.random() - 0.5) * W * 0.8,
+    y: H / 2 + (Math.random() - 0.5) * H * 0.8,
   }));
   const links = [];
   for (let i = 0; i < nodes.length; i++) {
