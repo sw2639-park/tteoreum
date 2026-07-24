@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tteoreum-v44';
+const CACHE_NAME = 'tteoreum-v45';
 const ASSETS = [
   '/',
   '/index.html',
@@ -102,23 +102,34 @@ self.addEventListener('push', (e) => {
   e.waitUntil(handlePush(e));
 });
 
+async function updateAppBadge(count) {
+  try {
+    if (count > 0 && typeof navigator.setAppBadge === 'function') {
+      await navigator.setAppBadge(count);
+    } else if (count === 0 && typeof navigator.clearAppBadge === 'function') {
+      await navigator.clearAppBadge();
+    }
+  } catch {
+    // 배지는 선택 기능이므로 무시
+  }
+}
+
 async function handlePush(e) {
   const count = await countUnhandled();
   const body = `미처리 ${count}건`;
 
-  if ('setAppBadge' in navigator) {
-    (count > 0 ? navigator.setAppBadge(count) : navigator.clearAppBadge()).catch(() => {});
-  }
-
-  await self.registration.showNotification(body, {
-    tag: 'daily-check',
-    renotify: false,
-    silent: true,
-    icon: '/icons/status-mono.png',
-    badge: '/icons/status-mono.png',
-    actions: [{ action: 'capture', title: '기록하기' }],
-    data: { intent: 'popup-input' }
-  });
+  await Promise.all([
+    updateAppBadge(count),
+    self.registration.showNotification(body, {
+      tag: 'daily-check',
+      renotify: false,
+      silent: true,
+      icon: '/icons/status-mono.png',
+      badge: '/icons/status-mono.png',
+      actions: [{ action: 'capture', title: '기록하기' }],
+      data: { intent: 'popup-input' }
+    }),
+  ]);
 }
 
 self.addEventListener('notificationclick', (e) => {

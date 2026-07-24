@@ -125,9 +125,15 @@ export async function renderInbox() {
 }
 
 function updateAppBadge(count) {
-  if (!('setAppBadge' in navigator)) return;
-  const p = count > 0 ? navigator.setAppBadge(count) : navigator.clearAppBadge();
-  p.catch(() => {});
+  try {
+    if (count > 0 && typeof navigator.setAppBadge === 'function') {
+      navigator.setAppBadge(count).catch(() => {});
+    } else if (count === 0 && typeof navigator.clearAppBadge === 'function') {
+      navigator.clearAppBadge().catch(() => {});
+    }
+  } catch {
+    // 배지는 선택 기능이므로 무시
+  }
 }
 
 const STALE_MS = 14 * 24 * 60 * 60 * 1000;
