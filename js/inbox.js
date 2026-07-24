@@ -21,6 +21,8 @@ export async function renderInbox() {
   const total = unhandledCount + allHandled;
   const rate = total > 0 ? Math.round((allHandled / total) * 100) : 0;
 
+  updateAppBadge(unhandledCount);
+
   screen.innerHTML = `
     <div class="header">
       <div class="header-brand">
@@ -122,6 +124,23 @@ export async function renderInbox() {
   refreshList();
 }
 
+function updateAppBadge(count) {
+  if (!('setAppBadge' in navigator)) return;
+  const p = count > 0 ? navigator.setAppBadge(count) : navigator.clearAppBadge();
+  p.catch(() => {});
+}
+
+const STALE_MS = 14 * 24 * 60 * 60 * 1000;
+
+function isStale(item) {
+  return item.status !== 'handled' && (Date.now() - new Date(item.createdAt).getTime()) >= STALE_MS;
+}
+
+function staleLabel(iso) {
+  const days = Math.floor((Date.now() - new Date(iso).getTime()) / 86400000);
+  return `${Math.floor(days / 7)}주째`;
+}
+
 function groupByDate(items) {
   const doneToday = items.filter(i => i.status === 'handled')
     .sort((a, b) => new Date(a.handledAt) - new Date(b.handledAt));
@@ -154,7 +173,9 @@ function buildItemRow(item) {
 
   const chipClass = item.type === 'idea' ? 'chip-idea' : 'chip-note';
   const chipLabel = item.type === 'idea' ? '아이디어' : '메모';
-  const dateStr = formatDate(item.createdAt);
+  const stale = isStale(item);
+  const dateStr = stale ? staleLabel(item.createdAt) : formatDate(item.createdAt);
+  const timeClass = stale ? 'item-time item-time-stale' : 'item-time';
 
   row.innerHTML = `
     <div class="item-bg item-bg-right">보류 ⏰</div>
@@ -163,7 +184,7 @@ function buildItemRow(item) {
       <span class="item-type-chip ${chipClass}">${chipLabel}</span>
       <span class="urgent-badge">${item.urgent ? '★' : ''}</span>
       <div class="item-text">${escapeHtml(item.content)}</div>
-      <span class="item-time">${dateStr}</span>
+      <span class="${timeClass}">${dateStr}</span>
     </div>
   `;
 

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tteoreum-v43';
+const CACHE_NAME = 'tteoreum-v44';
 const ASSETS = [
   '/',
   '/index.html',
@@ -105,6 +105,10 @@ self.addEventListener('push', (e) => {
 async function handlePush(e) {
   const count = await countUnhandled();
   const body = `미처리 ${count}건`;
+
+  if ('setAppBadge' in navigator) {
+    (count > 0 ? navigator.setAppBadge(count) : navigator.clearAppBadge()).catch(() => {});
+  }
 
   await self.registration.showNotification(body, {
     tag: 'daily-check',
