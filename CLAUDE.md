@@ -69,6 +69,8 @@ GTD식 "캡처함" 개인용 PWA. 떠오른 생각을 최소 마찰로 적어두
 ```
 /* 라이트 (기본) */
 --bg: #F6F5F2;
+--bg-wash-1: #FFE9D6;  (배경 방사형 워시, 유리 표면 뒤에 깊이감 주는 용도)
+--bg-wash-2: #DCE9FF;
 --ink: #191919;
 --muted: #9A968D;
 --line: #E3E0D9;
@@ -76,17 +78,38 @@ GTD식 "캡처함" 개인용 PWA. 떠오른 생각을 최소 마찰로 적어두
 --idea: #2D5BFF;     (아이디어 칩)
 --note: #9A968D;     (메모 칩)
 
+/* Liquid Glass 표면 토큰 (iOS 27 스타일, 2026-07 도입) */
+--glass-bg: rgba(255,255,255,0.55);
+--glass-bg-strong: rgba(255,255,255,0.72);   (팝업/모달 등 진한 유리)
+--glass-border: rgba(255,255,255,0.65);
+--glass-highlight: rgba(255,255,255,0.9);    (상단 inset 하이라이트용)
+--glass-shadow: rgba(60,45,25,0.12);
+--glass-blur: 22px;
+
 /* 다크 — prefers-color-scheme: dark 일 때 자동 전환, 토글 없음 */
 --bg: #1C1B19;
+--bg-wash-1: #2A2118;
+--bg-wash-2: #16202E;
 --ink: #F0EEE9;
 --muted: #8C887F;
 --line: #2C2A27;
 --accent: #FF6B47;   (다크에서는 살짝 톤 낮춤, 눈부심 방지)
+--glass-bg: rgba(38,36,33,0.55);
+--glass-bg-strong: rgba(45,43,39,0.78);
+--glass-border: rgba(255,255,255,0.10);
+--glass-highlight: rgba(255,255,255,0.14);
+--glass-shadow: rgba(0,0,0,0.5);
 
 폰트: -apple-system, "Apple SD Gothic Neo", "Pretendard", sans-serif
 ```
-웹폰트 새로 안 불러옴. 전체 톤은 미니멀·절제 — 그라데이션, 장식, 그림자 과용 금지.
-다크모드는 CSS `@media (prefers-color-scheme: dark)`로만 처리. JS 토글, 설정 항목 없음.
+웹폰트 새로 안 불러옴. 다크모드는 CSS `@media (prefers-color-scheme: dark)`로만 처리. JS 토글, 설정 항목 없음.
+
+**2026-07: iOS 27 Liquid Glass 스타일로 전체 리스킨 완료.** 기존 "그라데이션·장식·그림자 과용 금지"
+원칙은 이 리스킨으로 대체됨 — 헤더/카드/팝업/모달/시트는 `backdrop-filter: blur()` +
+반투명 배경(`--glass-*` 토큰)으로 유리질감 표현, body 배경에 은은한 방사형 워시(`--bg-wash-*`)를
+깔아 블러가 비칠 대상을 제공. 팝업류는 `glass-pop-in`/`glass-sheet-in` 스프링 애니메이션으로 등장.
+새 화면·컴포넌트를 추가할 때도 이 유리 표면 패턴(`--glass-*` 토큰 조합: background + backdrop-filter blur + border + inset 하이라이트)을 따를 것 —
+플랫한 단색 배경으로 되돌리지 말 것.
 
 **예외: 그래프뷰 화면은 항상 다크 고정** (시스템 라이트/다크 설정 무관).
 우주 테마 — 깊은 남색 배경, 별빛 점, 네뷸라 블롭, 비네트. 색상은 장식이 아니라
