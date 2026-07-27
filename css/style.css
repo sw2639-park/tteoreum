@@ -621,9 +621,10 @@ html, body {
   background: rgba(0,0,0,0.55);
   backdrop-filter: blur(3px);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   padding: 24px;
+  padding-top: max(72px, env(safe-area-inset-top, 0px) + 60px);
   z-index: 100;
 }
 
