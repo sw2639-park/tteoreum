@@ -13,7 +13,7 @@ let searchQuery = '';
 
 export async function renderInbox() {
   const items = await getInboxItems();
-  items.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+  items.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   const screen = document.getElementById('inbox-screen');
   const unhandledCount = items.filter(i => i.status !== 'handled').length;
